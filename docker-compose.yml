@@ -1,0 +1,11 @@
+﻿version: "3.9"
+services:
+  # Dev Docker
+  daemon:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - "./authorized_keys:/app/authorized_keys"
+    environment:
+      API_TOKEN: "YOUR_TOKEN"
