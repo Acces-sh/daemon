@@ -114,7 +114,7 @@ namespace Accessh.Daemon.Services
                 Log.Information("Authentication failed");
                 Log.Debug(e.Message);
 
-                if (e is HttpRequestException)
+                if (e is HttpRequestException || e is JsonException)
                 {
                     throw;
                 }
