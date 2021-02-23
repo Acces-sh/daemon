@@ -21,9 +21,10 @@ namespace Accessh.Daemon.Services
     public class ClientService : IClientService
     {
         private readonly CancellationTokenSource _cancellationToken;
-        private readonly HubConnection _connection;
+        private HubConnection _connection;
         private readonly IFileService _fileService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ServerConfiguration _serverConfiguration;
 
         public string Jwt { get; set; }
 
@@ -35,8 +36,16 @@ namespace Accessh.Daemon.Services
             _fileService = fileService;
             _serviceProvider = serviceProvider;
             Jwt = "";
+            _serverConfiguration = configuration;
+        }
+
+        /// <summary>
+        /// Attempt to connect to the Acces.sh API 
+        /// </summary>
+        public async Task Connect()
+        {
             _connection = new HubConnectionBuilder()
-                .WithUrl(configuration.HubUrl, options =>
+                .WithUrl(_serverConfiguration.HubUrl, options =>
                 {
                     options.SkipNegotiation = true;
                     options.Transports = HttpTransportType.WebSockets;
@@ -48,13 +57,7 @@ namespace Accessh.Daemon.Services
                     logging.AddConsole();
                 })
                 .Build();
-        }
-
-        /// <summary>
-        /// Attempt to connect to the Acces.sh API 
-        /// </summary>
-        public async Task Connect()
-        {
+            
             await _connection.StartAsync();
         }
 
