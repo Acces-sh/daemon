@@ -40,7 +40,6 @@ namespace Accessh.Daemon
         public Task StopAsync(CancellationToken cancellationToken)
         {
             CloseRequested.Set();
-            _daemonService.Dispose();
 
             if (_work == null) return Task.CompletedTask;
             
@@ -56,6 +55,7 @@ namespace Accessh.Daemon
         public void Dispose()
         {
             Log.Information("The daemon will close now.");
+            _daemonService.Dispose();
         }
     }
 }
