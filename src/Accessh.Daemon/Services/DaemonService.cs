@@ -139,6 +139,7 @@ namespace Accessh.Daemon.Services
             try
             {
                 await _clientService.Connect();
+                Log.Information("Success connection to server api.");
                 _clientService.InitRoute();
                 _clientService.AskGetKeys();
             }
@@ -156,8 +157,6 @@ namespace Accessh.Daemon.Services
                     return;
                 }
             }
-
-            Log.Information("Success connection to server api.");
         }
         
         /// <summary>
