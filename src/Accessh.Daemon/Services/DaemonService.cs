@@ -139,6 +139,7 @@ namespace Accessh.Daemon.Services
             try
             {
                 await _clientService.Connect();
+                Log.Information("Success connection to server api.");
                 _clientService.InitRoute();
                 _clientService.AskGetKeys();
             }
@@ -153,11 +154,8 @@ namespace Accessh.Daemon.Services
                     Log.Fatal("A critical error has occurred. ");
                     Log.Warning(e.Message);
                     _cancellationToken.Cancel();
-                    return;
                 }
             }
-
-            Log.Information("Success connection to server api.");
         }
         
         /// <summary>
