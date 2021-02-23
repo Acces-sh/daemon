@@ -10,7 +10,7 @@ namespace Accessh.Daemon
     /// <summary>
     /// Worker service
     /// </summary>
-    public class HostService : IHostedService, IAsyncDisposable
+    public class HostService : IHostedService, IDisposable
     {
         private static readonly AutoResetEvent CloseRequested = new(false);
         private Task _work;
@@ -53,7 +53,7 @@ namespace Accessh.Daemon
         /// Dispose daemon
         /// </summary>
         /// Automatically executed after <see cref="StopAsync"/>
-        public async ValueTask DisposeAsync()
+        public void Dispose()
         {
             Log.Information("The daemon will close now.");
         }

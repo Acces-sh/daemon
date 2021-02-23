@@ -154,7 +154,6 @@ namespace Accessh.Daemon.Services
                     Log.Fatal("A critical error has occurred. ");
                     Log.Warning(e.Message);
                     _cancellationToken.Cancel();
-                    return;
                 }
             }
         }
