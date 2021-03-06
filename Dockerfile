@@ -15,4 +15,5 @@ RUN dotnet publish -c release -o /app -r linux-musl-x64 --self-contained true /p
 FROM mcr.microsoft.com/dotnet/runtime:5.0-alpine-amd64
 WORKDIR /app
 COPY --from=build /app .
+RUN touch /app/authorized_keys
 ENTRYPOINT ["dotnet","Accessh.Daemon.dll"]
