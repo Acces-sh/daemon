@@ -66,7 +66,10 @@ namespace Accessh.Daemon.Services
         /// </summary>
         public async Task Dispose()
         {
-            await _connection.DisposeAsync();
+            if (_connection != null)
+            {
+                await _connection.DisposeAsync();
+            }
         }
 
         /// <summary>
