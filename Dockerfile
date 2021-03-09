@@ -12,7 +12,7 @@ COPY . .
 RUN dotnet publish -c release -o /app -r linux-musl-x64 --self-contained false /p:PublishTrimmed=false /p:PublishReadyToRun=true
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/runtime:5.0-alpine-amd64
+FROM mcr.microsoft.com/dotnet/aspnet:5.0.3-alpine3.13-amd64
 WORKDIR /app
 COPY --from=build /app .
 RUN touch /app/authorized_keys
