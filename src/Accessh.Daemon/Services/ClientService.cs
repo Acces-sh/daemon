@@ -57,18 +57,25 @@ namespace Accessh.Daemon.Services
                     logging.AddConsole();
                 })
                 .Build();
-            
+
             await _connection.StartAsync();
         }
 
         /// <summary>
         /// End the connection with the remote server
         /// </summary>
-        public async Task Dispose()
+        public void Dispose()
         {
-            if (_connection != null)
+            if (_connection == null) return;
+            
+            try
             {
-                await _connection.DisposeAsync();
+                _connection.StopAsync().Wait(TimeSpan.FromSeconds(10));
+            }
+            catch (Exception e)
+            {
+                Log.Debug(e.Message);
+                throw;
             }
         }
 
@@ -101,7 +108,7 @@ namespace Accessh.Daemon.Services
         /// </summary>
         /// <param name="error"></param>
         /// <returns></returns>
-        private async Task ConnectionHandler(Exception error)
+        private Task ConnectionHandler(Exception error)
         {
             Log.Warning(
                 "The connection between the server and the client has been disrupted. Attempt to reconnect ...");
@@ -109,15 +116,16 @@ namespace Accessh.Daemon.Services
 
             try
             {
-                await Dispose();
+                Dispose();
             }
             catch (Exception e)
             {
-                Log.Warning("The authorized key file could not be cleaned...");
-                Log.Debug(e.Message);
+                Log.Debug("Connection can't be disposed.");
             }
 
             RestartAuthentication();
+            
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -164,7 +172,7 @@ namespace Accessh.Daemon.Services
         /// </summary>
         /// <param name="serverAction"></param>
         [AutomaticRetry(Attempts = 0)]
-        private async Task ServerActionHandler(ServerAction serverAction)
+        private Task ServerActionHandler(ServerAction serverAction)
         {
             Log.Information("Receive server action request -> " + serverAction);
 
@@ -177,7 +185,7 @@ namespace Accessh.Daemon.Services
                 case ServerAction.Reconnect:
                 case ServerAction.Authentication:
                     Log.Information("The daemon will reconnect ");
-                    await Dispose();
+                    Dispose();
                     RestartAuthentication();
                     break;
                 case ServerAction.Logout:
@@ -185,6 +193,8 @@ namespace Accessh.Daemon.Services
                     _cancellationToken.Cancel();
                     break;
             }
+
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -207,7 +217,7 @@ namespace Accessh.Daemon.Services
         }
 
         #endregion
-        
+
         /// <summary>
         /// Performs a new authentication
         /// </summary>
