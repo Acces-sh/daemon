@@ -5,6 +5,7 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+      dockerfile: ./Dockerfiles/amd64/Dockerfile
     volumes:
       - "./authorized_keys:/app/authorized_keys"
     environment:

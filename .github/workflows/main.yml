@@ -31,5 +31,5 @@ jobs:
         with:
           tags: ghcr.io/acces-sh/daemon:latest
           context: ./
-          file: ./Dockerfile
+          file: ./Dockerfiles/amd64/Dockerfile
           push: true

@@ -16,4 +16,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:5.0.3-alpine3.13-amd64
 WORKDIR /app
 COPY --from=build /app .
 RUN touch /app/authorized_keys
+ENV DOCKER true
 ENTRYPOINT ["dotnet","Accessh.Daemon.dll"]
