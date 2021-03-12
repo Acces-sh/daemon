@@ -6,7 +6,7 @@ namespace Accessh.Configuration.Interfaces
     {
         string Jwt { set; }
         Task Connect();
-        Task Dispose();
+        void Dispose();
         void InitRoute();
         void AskGetKeys();
     }

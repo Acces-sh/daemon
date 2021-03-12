@@ -167,7 +167,7 @@ namespace Accessh.Daemon.Services
             try
             {
                 await _fileService.RemoveAll();
-                await _clientService.Dispose();
+                _clientService.Dispose();
             }
             catch (Exception e)
             {
