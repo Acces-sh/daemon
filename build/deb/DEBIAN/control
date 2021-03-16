@@ -1,0 +1,9 @@
+Package: sh-daemon
+Version: 1.0
+Section: custom
+Priority: optional
+Architecture: all
+Essential: no
+Maintainer: Karim Moussaoui <karim.moussaoui@acces.sh>
+Description: Acces.sh daemon
+ Synchronize ssh access via your ssh keys

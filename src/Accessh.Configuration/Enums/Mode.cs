@@ -4,5 +4,6 @@
     {
         Binary = 0,
         Docker = 1,
+        Debian = 2,
     }
 }
