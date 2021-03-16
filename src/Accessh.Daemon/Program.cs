@@ -47,6 +47,8 @@ namespace Accessh.Daemon
             {
                 switch (e)
                 {
+                    case DirectoryNotFoundException:
+                    case FileNotFoundException:
                     case FormatException:
                         Console.WriteLine(
                             "The configuration file (config.json) cannot be found.");
