@@ -120,7 +120,7 @@ namespace Accessh.Daemon.Services
             }
             catch (Exception e)
             {
-                Log.Debug("Connection can't be disposed.");
+                Log.Debug("Connection can't be disposed : " + e.Message);
             }
 
             RestartAuthentication();
