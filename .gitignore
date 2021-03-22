@@ -4,4 +4,5 @@ obj/
 .idea/
 .vs/
 app/
-authorized_key
+authorized_keyauthorized_key
+build/app
