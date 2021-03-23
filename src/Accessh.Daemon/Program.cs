@@ -36,8 +36,12 @@ namespace Accessh.Daemon
                     .AddEnvironmentVariables()
                     .Build();
                 appConfiguration = InitializeAppConfiguration(configurationRoot);
+                
+                var configPath = appConfiguration.Mode == Mode.Docker
+                    ? Directory.GetCurrentDirectory()
+                    : appConfiguration.ConfigurationFilePath;
                 var appConfigurationRoot = new ConfigurationBuilder()
-                    .SetBasePath(appConfiguration.ConfigurationFilePath)
+                    .SetBasePath(configPath)
                     .AddJsonFile("config.json", false, true)
                     .AddEnvironmentVariables()
                     .Build();
@@ -111,7 +115,7 @@ namespace Accessh.Daemon
         {
             var keyConfiguration = new KeyConfiguration();
             var tokenEnv = Environment.GetEnvironmentVariable("API_TOKEN");
-            
+
             configurationRoot.Bind(keyConfiguration);
             Validator.ValidateObject(keyConfiguration, new ValidationContext(keyConfiguration),
                 true);
@@ -120,7 +124,7 @@ namespace Accessh.Daemon
             {
                 keyConfiguration.ApiToken = tokenEnv;
             }
-            
+
             return keyConfiguration;
         }
     }
