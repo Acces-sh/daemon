@@ -31,7 +31,7 @@ jobs:
       - name: Publish Docker Image
         uses: docker/build-push-action@v2
         with:
-          tags: ghcr.io/acces-sh/daemon-test:latest,ghcr.io/acces-sh/daemon-test:${{ github.event.inputs.version }}
+          tags: ghcr.io/acces-sh/daemon:latest,ghcr.io/acces-sh/daemon:${{ github.event.inputs.version }}
           context: ./
           file: ./Dockerfiles/amd64/Dockerfile
           push: true
