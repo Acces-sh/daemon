@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Accessh.Configuration;
+using Accessh.Configuration.Enums;
 using Accessh.Configuration.Interfaces;
 using Accessh.Daemon.Services;
 using Hangfire;
@@ -17,13 +18,53 @@ namespace Accessh.Daemon
 {
     public static class Program
     {
-        public static async Task Main(string[] args)
+        private const int ERROR_FILE_NOT_FOUND = -0x2;
+        private const int ERROR_INVALID_DATA = -0xD;
+
+        public static async Task<int> Main(string[] args)
         {
-            var configurationRoot = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", false, true)
-                .AddEnvironmentVariables()
-                .Build();
+            var cts = new CancellationTokenSource();
+            AppConfiguration appConfiguration;
+            KeyConfiguration keyConfiguration;
+            IConfigurationRoot configurationRoot;
+
+            try
+            {
+                configurationRoot = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json", false, true)
+                    .AddEnvironmentVariables()
+                    .Build();
+                appConfiguration = InitializeAppConfiguration(configurationRoot);
+                
+                var configPath = appConfiguration.Mode == Mode.Docker
+                    ? Directory.GetCurrentDirectory()
+                    : appConfiguration.ConfigurationFilePath;
+                var appConfigurationRoot = new ConfigurationBuilder()
+                    .SetBasePath(configPath)
+                    .AddJsonFile("config.json", false, true)
+                    .AddEnvironmentVariables()
+                    .Build();
+                keyConfiguration = InitializeKeyConfiguration(appConfigurationRoot, appConfiguration);
+            }
+            catch (Exception e)
+            {
+                switch (e)
+                {
+                    case DirectoryNotFoundException:
+                    case FileNotFoundException:
+                    case FormatException:
+                        Console.WriteLine(
+                            "The configuration file (config.json) cannot be found.");
+                        return ERROR_FILE_NOT_FOUND;
+                    case ValidationException:
+                        Console.WriteLine("Please check the information in the config.json file.");
+                        return ERROR_INVALID_DATA;
+                    default:
+                        throw;
+                }
+            }
+
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Debug()
@@ -32,16 +73,13 @@ namespace Accessh.Daemon
                 .ReadFrom.Configuration(configurationRoot)
                 .CreateLogger();
 
-            Log.Information("Starting..");
-
-            var cts = new CancellationTokenSource();
-            var serverConfiguration = InitializeConfiguration(configurationRoot);
             var builder = Host.CreateDefaultBuilder(args)
                 .UseSerilog()
                 .ConfigureServices((_, services) =>
                 {
                     services.AddHostedService<HostService>();
-                    services.AddSingleton(serverConfiguration);
+                    services.AddSingleton(appConfiguration);
+                    services.AddSingleton(keyConfiguration);
                     services.AddSingleton(cts);
                     services.AddSingleton<IDaemonService, DaemonService>();
                     services.AddSingleton<IFileService, FileService>();
@@ -57,20 +95,37 @@ namespace Accessh.Daemon
                 });
 
             await builder.RunConsoleAsync(cts.Token);
+
+            return 0;
         }
 
-        private static ServerConfiguration InitializeConfiguration(IConfigurationRoot configurationRoot)
+        private static AppConfiguration InitializeAppConfiguration(IConfiguration configurationRoot)
         {
-            var token = Environment.GetEnvironmentVariable("API_TOKEN");
-            var serverConfiguration = new ServerConfiguration();
+            var serverConfiguration = new AppConfiguration();
 
             configurationRoot.Bind(serverConfiguration);
             Validator.ValidateObject(serverConfiguration, new ValidationContext(serverConfiguration),
                 true);
-            if (!string.IsNullOrEmpty(token))
-                serverConfiguration.ApiToken = token;
 
             return serverConfiguration;
+        }
+
+        private static KeyConfiguration InitializeKeyConfiguration(IConfiguration configurationRoot,
+            AppConfiguration appConfiguration)
+        {
+            var keyConfiguration = new KeyConfiguration();
+            var tokenEnv = Environment.GetEnvironmentVariable("API_TOKEN");
+
+            configurationRoot.Bind(keyConfiguration);
+            Validator.ValidateObject(keyConfiguration, new ValidationContext(keyConfiguration),
+                true);
+
+            if (appConfiguration.Mode == Mode.Docker)
+            {
+                keyConfiguration.ApiToken = tokenEnv;
+            }
+
+            return keyConfiguration;
         }
     }
 }

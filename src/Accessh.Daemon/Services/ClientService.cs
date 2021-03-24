@@ -24,19 +24,19 @@ namespace Accessh.Daemon.Services
         private HubConnection _connection;
         private readonly IFileService _fileService;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ServerConfiguration _serverConfiguration;
+        private readonly AppConfiguration _appConfiguration;
 
         public string Jwt { get; set; }
 
         public ClientService(CancellationTokenSource cancellationToken, IFileService fileService,
-            ServerConfiguration configuration,
+            AppConfiguration configuration,
             IServiceProvider serviceProvider)
         {
             _cancellationToken = cancellationToken;
             _fileService = fileService;
             _serviceProvider = serviceProvider;
             Jwt = "";
-            _serverConfiguration = configuration;
+            _appConfiguration = configuration;
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Accessh.Daemon.Services
         public async Task Connect()
         {
             _connection = new HubConnectionBuilder()
-                .WithUrl(_serverConfiguration.HubUrl, options =>
+                .WithUrl(_appConfiguration.HubUrl, options =>
                 {
                     options.SkipNegotiation = true;
                     options.Transports = HttpTransportType.WebSockets;
@@ -120,7 +120,7 @@ namespace Accessh.Daemon.Services
             }
             catch (Exception e)
             {
-                Log.Debug("Connection can't be disposed.");
+                Log.Debug("Connection can't be disposed : " + e.Message);
             }
 
             RestartAuthentication();

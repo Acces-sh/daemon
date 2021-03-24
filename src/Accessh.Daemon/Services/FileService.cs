@@ -4,8 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Accessh.Configuration;
+using Accessh.Configuration.Enums;
 using Accessh.Configuration.Exception;
 using Accessh.Configuration.Interfaces;
+using Serilog;
 
 namespace Accessh.Daemon.Services
 {
@@ -18,34 +21,37 @@ namespace Accessh.Daemon.Services
         private const string FileFooter = "########################## END ACCES.SH ##########################";
         private const string FileName = "authorized_keys";
         private readonly string _keyFilePath;
+        private readonly AppConfiguration _appConfiguration;
 
-        public FileService()
+        public FileService(KeyConfiguration keyConfiguration, AppConfiguration appConfiguration)
         {
-            var separator = "\\";
+            _appConfiguration = appConfiguration;
 
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
+            if (_appConfiguration.Mode == Mode.Docker)
             {
-                separator = "/";
-            }
+                var separator = "\\";
 
-            _keyFilePath = Directory.GetCurrentDirectory() + separator + FileName;
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
+                {
+                    separator = "/";
+                }
+
+                _keyFilePath = Directory.GetCurrentDirectory() + separator + FileName;
+            }
+            else
+            {
+                _keyFilePath = keyConfiguration.AuthorizedKeyFilePath;
+            }
         }
 
         /// <summary>
-        /// Checks if the file exists and if it can be read or written.
+        /// Checks if the file can be read or written.
         /// </summary>
         /// <exception cref="FileNotFoundException">Authorized key file not found.</exception>
         /// <exception cref="FilePermissionException">Authorized keu file can't be read or written.</exception>
         /// <exception cref="Exception">Multiple exception caused by directory/file reading</exception>
         public void CheckPermissions()
         {
-            var currentDirectoryFiles = Directory.GetFiles(Directory.GetCurrentDirectory());
-
-            if (currentDirectoryFiles.Contains(_keyFilePath) == false)
-            {
-                throw new FileNotFoundException();
-            }
-
             using var fs = new FileStream(_keyFilePath, FileMode.Open);
             var canRead = fs.CanRead;
             var canWrite = fs.CanWrite;
@@ -168,6 +174,7 @@ namespace Accessh.Daemon.Services
         }
 
         #region Jobs
+
         /// <summary>
         /// Add keys job
         /// </summary>
@@ -178,7 +185,7 @@ namespace Accessh.Daemon.Services
             await RemoveAll();
             await Add(keys);
         }
-        
+
         /// <summary>
         /// Remove keys job
         /// </summary>

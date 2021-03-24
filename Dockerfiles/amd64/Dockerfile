@@ -9,6 +9,9 @@ RUN dotnet restore Accessh.Daemon/Accessh.Daemon.csproj -r linux-musl-x64
 
 # copy and publish app and libraries
 COPY . .
+RUN ls -l ./Accessh.Daemon
+RUN rm src/Accessh.Daemon/appsettings.json
+RUN mv src/Accessh.Daemon/appsettings.Docker.json src/Accessh.Daemon/appsettings.json
 RUN dotnet publish -c release -o /app -r linux-musl-x64 --self-contained false /p:PublishTrimmed=false /p:PublishReadyToRun=true
 
 # final stage/image
@@ -16,4 +19,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:5.0.3-alpine3.13-amd64
 WORKDIR /app
 COPY --from=build /app .
 RUN touch /app/authorized_keys
+ENV DOCKER true
 ENTRYPOINT ["dotnet","Accessh.Daemon.dll"]

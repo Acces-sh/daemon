@@ -17,9 +17,9 @@ namespace Accessh.Daemon.Services
         private readonly string _serverUrl;
         private readonly string _apiToken;
 
-        public AuthenticationService(ServerConfiguration configuration)
+        public AuthenticationService(AppConfiguration configuration, KeyConfiguration keyConfiguration)
         {
-            _apiToken = configuration.ApiToken;
+            _apiToken = keyConfiguration.ApiToken;
             _serverUrl = configuration.ServerUrl;
         }
         

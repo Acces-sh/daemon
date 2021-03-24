@@ -18,19 +18,22 @@ namespace Accessh.Daemon.Services
     public class DaemonService : IDaemonService
     {
         private readonly CancellationTokenSource _cancellationToken;
-        private readonly ServerConfiguration _configuration;
+        private readonly AppConfiguration _appConfiguration;
+        private readonly KeyConfiguration _keyConfiguration;
         private readonly IAuthenticationService _authenticationService;
         private readonly IClientService _clientService;
         private readonly IFileService _fileService;
         
         public DaemonService(CancellationTokenSource cancellationToken,
-            ServerConfiguration configuration,
+            AppConfiguration appConfiguration,
+            KeyConfiguration keyConfiguration,
             IClientService clientService,
             IFileService fileService)
         {
             _cancellationToken = cancellationToken;
-            _configuration = configuration;
-            _authenticationService = new AuthenticationService(configuration);
+            _appConfiguration = appConfiguration;
+            _keyConfiguration = keyConfiguration;
+            _authenticationService = new AuthenticationService(appConfiguration, keyConfiguration);
             _clientService = clientService;
             _fileService = fileService;
         }
@@ -40,9 +43,10 @@ namespace Accessh.Daemon.Services
         /// </summary>
         public void Worker()
         {
-            Log.Information("Acces.sh Daemon, Version : " + _configuration.Version);
-
-            if (string.IsNullOrEmpty(_configuration.ApiToken) || _configuration.ApiToken.Length < 50)
+            Log.Information("Starting..");
+            Log.Information("Acces.sh Daemon, Version : " + _appConfiguration.Version);
+            
+            if (string.IsNullOrEmpty(_keyConfiguration.ApiToken) || _keyConfiguration.ApiToken.Length < 50)
             {
                 Log.Warning("No token provided !");
                 _cancellationToken.Cancel();
@@ -58,6 +62,7 @@ namespace Accessh.Daemon.Services
             {
                 switch (e)
                 {
+                    case DirectoryNotFoundException:
                     case FileNotFoundException _:
                         Log.Fatal("Authorized key file don't exist !");
                         break;
