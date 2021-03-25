@@ -26,7 +26,7 @@ $sudo_cmd rm -f shdaemon_$daemon_version-1_amd64.deb
 
 echo -e "\033[34m\n* The daemon has been installed.\n\033[0m"
 
-if (( $# != 1 )); then
+if [[ -z "${API_TOKEN}" ]]; then
   echo -e "\033[33mWarning: No token were provided. You will have to modify the /etc/sh-daemon/config.json file before running daemon.\033[0m"
   echo -e "\033[33mOnce modified, execute the following command: $restart_cmd\033[0m"
 else
@@ -35,7 +35,7 @@ else
   wget https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
   chmod +x jq-linux64
 
-  ./jq-linux64 '.ApiToken="'$1'"' $config_location > $file_name_temp
+  ./jq-linux64 '.ApiToken="'${API_TOKEN}'"' $config_location > $file_name_temp
   rm jq-linux64
   $sudo_cmd  mv -f config_daemon.json $config_location
   echo -e "\033[34m\n* The key has been installed.\n\033[0m"
