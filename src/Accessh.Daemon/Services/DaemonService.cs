@@ -23,7 +23,7 @@ namespace Accessh.Daemon.Services
         private readonly IAuthenticationService _authenticationService;
         private readonly IClientService _clientService;
         private readonly IFileService _fileService;
-        
+
         public DaemonService(CancellationTokenSource cancellationToken,
             AppConfiguration appConfiguration,
             KeyConfiguration keyConfiguration,
@@ -37,7 +37,7 @@ namespace Accessh.Daemon.Services
             _clientService = clientService;
             _fileService = fileService;
         }
-        
+
         /// <summary>
         /// Entrypoint of daemon
         /// </summary>
@@ -45,7 +45,7 @@ namespace Accessh.Daemon.Services
         {
             Log.Information("Starting..");
             Log.Information("Acces.sh Daemon, Version : " + _appConfiguration.Version);
-            
+
             if (string.IsNullOrEmpty(_keyConfiguration.ApiToken) || _keyConfiguration.ApiToken.Length < 50)
             {
                 Log.Warning("No token provided !");
@@ -117,9 +117,11 @@ namespace Accessh.Daemon.Services
             catch (Exception e)
             {
                 Log.Information("Authentication failed");
+                Log.Debug(e.GetType().Name);
                 Log.Debug(e.Message);
-
-                if (e is HttpRequestException || e is JsonException)
+                
+                if (e is HttpRequestException or JsonException ||
+                    e is TaskCanceledException && e.InnerException is TimeoutException)
                 {
                     throw;
                 }
@@ -162,7 +164,7 @@ namespace Accessh.Daemon.Services
                 }
             }
         }
-        
+
         /// <summary>
         /// Dispose daemon service
         /// </summary>
