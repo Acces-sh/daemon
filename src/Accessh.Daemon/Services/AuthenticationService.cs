@@ -13,7 +13,7 @@ namespace Accessh.Daemon.Services
     /// </summary>
     public class AuthenticationService : IAuthenticationService
     {
-        private const string ServerAuthUri = "server/auth";
+        private const string ServerAuthUri = "auth/server";
         private readonly string _serverUrl;
         private readonly string _apiToken;
 
