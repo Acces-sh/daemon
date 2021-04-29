@@ -21,13 +21,10 @@ namespace Accessh.Daemon.Services
         private const string FileFooter = "########################## END ACCES.SH ##########################";
         private const string FileName = "authorized_keys";
         private readonly string _keyFilePath;
-        private readonly AppConfiguration _appConfiguration;
 
         public FileService(KeyConfiguration keyConfiguration, AppConfiguration appConfiguration)
         {
-            _appConfiguration = appConfiguration;
-
-            if (_appConfiguration.Mode == Mode.Docker)
+            if (appConfiguration.Mode == Mode.Docker)
             {
                 var separator = "\\";
 

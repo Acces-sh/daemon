@@ -44,11 +44,11 @@ namespace Accessh.Daemon.Services
         public void Worker()
         {
             Log.Information("Starting..");
-            Log.Information("Acces.sh Daemon, Version : " + _appConfiguration.Version);
+            Log.Information("Acces.sh Daemon, Version : {Version} ", _appConfiguration.Version);
 
             if (string.IsNullOrEmpty(_keyConfiguration.ApiToken) || _keyConfiguration.ApiToken.Length < 50)
             {
-                Log.Warning("No token provided !");
+                Log.Warning("No token provided");
                 _cancellationToken.Cancel();
                 return;
             }
@@ -70,7 +70,7 @@ namespace Accessh.Daemon.Services
                         Log.Fatal("The daemon does not have permissions to write to the authorized_key file ");
                         break;
                     default:
-                        Log.Fatal($"An error has occurred ! {e.Message}");
+                        Log.Fatal("An error has occurred ! {Message}", e.Message);
                         break;
                 }
 
@@ -85,7 +85,7 @@ namespace Accessh.Daemon.Services
         [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] {10, 30, 60, 120, 300})]
         public async Task StartAuthenticationTask()
         {
-            Log.Information("Authentication attempt with the acces.sh API.");
+            Log.Information("Daemon: Authentication attempt with the acces.sh API");
             var serializerOption = new JsonSerializerOptions {PropertyNameCaseInsensitive = true};
 
             try
@@ -96,6 +96,7 @@ namespace Accessh.Daemon.Services
                 {
                     var errorResponse = await JsonSerializer.DeserializeAsync
                         <Response<string[]>>(await response.Content.ReadAsStreamAsync(), serializerOption);
+                    
                     if (errorResponse != null)
                     {
                         ShowErrors(errorResponse.Errors);
@@ -108,17 +109,17 @@ namespace Accessh.Daemon.Services
                 var content = await JsonSerializer.DeserializeAsync
                     <Response<string>>(await response.Content.ReadAsStreamAsync(), serializerOption);
 
-                if (content == null) throw new Exception("Authentication failed");
+                if (content == null) throw new Exception("Daemon : Authentication succeeded ");
 
                 _clientService.Jwt = content.Data;
 
-                Log.Information("The daemon has been authenticated");
+                Log.Information("Daemon: The daemon has been authenticated");
             }
             catch (Exception e)
             {
-                Log.Information("Authentication failed");
-                Log.Debug(e.GetType().Name);
-                Log.Debug(e.Message);
+                Log.Information("Daemon : Authentication failed");
+                Log.Debug("Daemon: {Name}", e.GetType().Name);
+                Log.Debug("Daemon: {Message}", e.Message);
                 
                 if (e is HttpRequestException or JsonException ||
                     e is TaskCanceledException && e.InnerException is TimeoutException)
@@ -126,7 +127,7 @@ namespace Accessh.Daemon.Services
                     throw;
                 }
 
-                Log.Fatal("A critical error has occurred. ");
+                Log.Fatal("Daemon: A critical error has occurred");
                 _cancellationToken.Cancel();
                 return;
             }
@@ -141,12 +142,12 @@ namespace Accessh.Daemon.Services
         [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] {10, 30, 60, 120, 300})]
         public async Task StartConnectionTask()
         {
-            Log.Information("Connection attempt with the acces.sh API.");
+            Log.Information("Daemon: Connection attempt with the acces.sh API");
 
             try
             {
                 await _clientService.Connect();
-                Log.Information("Success connection to server api.");
+                Log.Information("Daemon: Success connection to acces.sh api");
                 _clientService.InitRoute();
                 _clientService.AskGetKeys();
             }
@@ -154,12 +155,12 @@ namespace Accessh.Daemon.Services
             {
                 if (e is WebSocketException)
                 {
-                    Log.Warning("Connection failed ... Next attempt soon");
+                    Log.Warning("Daemon: Connection failed ... Next attempt soon");
                 }
                 else
                 {
-                    Log.Fatal("A critical error has occurred. ");
-                    Log.Warning(e.Message);
+                    Log.Fatal("Daemon: A critical error has occurred");
+                    Log.Warning("Daemon: {Message}", e.Message);
                     _cancellationToken.Cancel();
                 }
             }
@@ -178,8 +179,8 @@ namespace Accessh.Daemon.Services
             }
             catch (Exception e)
             {
-                Log.Warning("The authorized key file could not be emptied. Please check the file.");
-                Log.Debug(e.Message);
+                Log.Warning("Daemon: The authorized key file could not be emptied. Please check the file");
+                Log.Debug("Daemon: {Message}", e.Message);
             }
         }
 
@@ -191,7 +192,7 @@ namespace Accessh.Daemon.Services
         {
             foreach (var error in errors)
             {
-                Log.Warning(error);
+                Log.Warning("Daemon: {Error}", error);
             }
         }
     }
