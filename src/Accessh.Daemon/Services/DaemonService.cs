@@ -109,7 +109,7 @@ namespace Accessh.Daemon.Services
                 var content = await JsonSerializer.DeserializeAsync
                     <Response<string>>(await response.Content.ReadAsStreamAsync(), serializerOption);
 
-                if (content == null) throw new Exception("Daemon : Authentication succeeded ");
+                if (content == null) throw new Exception("Daemon: Authentication succeeded ");
 
                 _clientService.Jwt = content.Data;
 
@@ -117,7 +117,7 @@ namespace Accessh.Daemon.Services
             }
             catch (Exception e)
             {
-                Log.Information("Daemon : Authentication failed");
+                Log.Information("Daemon: Authentication failed");
                 Log.Debug("Daemon: {Name}", e.GetType().Name);
                 Log.Debug("Daemon: {Message}", e.Message);
                 
