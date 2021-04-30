@@ -112,7 +112,7 @@ namespace Accessh.Daemon.Services
         private Task ConnectionHandler(Exception error)
         {
             Log.Warning(
-                "Client: The connection between the server and the client has been disrupted. Attempt to reconnect ...");
+                "Client: The connection between the server and the client has been disrupted");
 
             if (error != null)
             {
@@ -127,7 +127,7 @@ namespace Accessh.Daemon.Services
             {
                 Log.Debug("Client: Connection can't be disposed {Message}", e.Message);
             }
-
+            Log.Information("Client: Attempt to reconnect ...");
             RestartAuthentication();
             
             return Task.CompletedTask;
@@ -230,7 +230,7 @@ namespace Accessh.Daemon.Services
             using var scope = _serviceProvider.CreateScope();
             var daemon = scope.ServiceProvider.GetService<IDaemonService>();
 
-            BackgroundJob.Schedule(() => daemon.StartAuthenticationTask(), TimeSpan.FromMinutes(1));
+            BackgroundJob.Enqueue(() => daemon.StartAuthenticationTask());
         }
     }
 }
