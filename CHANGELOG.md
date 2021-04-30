@@ -1,8 +1,19 @@
 # Release Notes
 
+## v1.0.2
+
+### Enhancement
+
+- The daemon tries to reconnect immediately after a connection loss instead of waiting for a minute
+
+### Other Notes
+
+- Update log messages
+- Update api url (Auth & Hub)
+
 ## v1.0.1
 
-#### Bug Fixes
+### Bug Fixes
 
 - The daemon no longer stops if the authentication request expired
 

@@ -1,7 +1,8 @@
-### Bug Fixes
+### Enhancement
 
-- The daemon no longer stops if the authentication request expired
+- The daemon tries to reconnect immediately after a connection loss instead of waiting for a minute
 
 ### Other Notes
 
-- After a loss of connection, the daemon immediately made a new connection attempt. From now on, it will wait 1 minute before any attempt.
+- Update log messages
+- Update api url (Auth & Hub)

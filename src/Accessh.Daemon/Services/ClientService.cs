@@ -74,7 +74,8 @@ namespace Accessh.Daemon.Services
             }
             catch (Exception e)
             {
-                Log.Debug(e.Message);
+                Log.Information("Client: The connection cannot be properly stopped");
+                Log.Debug("Client: {Message}",e.Message);
                 throw;
             }
         }
@@ -97,7 +98,7 @@ namespace Accessh.Daemon.Services
         /// </summary>
         public async void AskGetKeys()
         {
-            Log.Information("Request for ssh key synchronization");
+            Log.Information("Client: Request for ssh key synchronization");
             await _connection.InvokeAsync("GetKeys");
         }
 
@@ -111,8 +112,12 @@ namespace Accessh.Daemon.Services
         private Task ConnectionHandler(Exception error)
         {
             Log.Warning(
-                "The connection between the server and the client has been disrupted. Attempt to reconnect ...");
-            Log.Debug(error.Message);
+                "Client: The connection between the server and the client has been disrupted");
+
+            if (error != null)
+            {
+                Log.Debug("Client: {Message}", error.Message);
+            }
 
             try
             {
@@ -120,9 +125,9 @@ namespace Accessh.Daemon.Services
             }
             catch (Exception e)
             {
-                Log.Debug("Connection can't be disposed : " + e.Message);
+                Log.Debug("Client: Connection can't be disposed {Message}", e.Message);
             }
-
+            Log.Information("Client: Attempt to reconnect ...");
             RestartAuthentication();
             
             return Task.CompletedTask;
@@ -137,12 +142,11 @@ namespace Accessh.Daemon.Services
         {
             if (status) return;
 
-            Log.Error("Authentication failed");
+            Log.Error("Client: Authentication failed");
             foreach (var message in messages)
             {
-                Log.Error(message);
+                Log.Error("Client: {Message}", message);
             }
-
             _cancellationToken.Cancel();
         }
 
@@ -152,7 +156,7 @@ namespace Accessh.Daemon.Services
         /// <param name="keys"></param>
         private void AddKeysHandler(IList<string> keys)
         {
-            Log.Information("Receive action -> Add keys");
+            Log.Information("Client: Receive action -> Add keys");
             BackgroundJob.Enqueue(() => _fileService.AddKeysJob(keys));
         }
 
@@ -163,7 +167,7 @@ namespace Accessh.Daemon.Services
         [AutomaticRetry(Attempts = 0)]
         private void RemoveKeysHandler(IList<string> keys)
         {
-            Log.Information("Receive action -> Remove keys");
+            Log.Information("Client: Receive action -> Remove keys");
             BackgroundJob.Enqueue(() => _fileService.RemoveKeysJob(keys));
         }
 
@@ -174,22 +178,22 @@ namespace Accessh.Daemon.Services
         [AutomaticRetry(Attempts = 0)]
         private Task ServerActionHandler(ServerAction serverAction)
         {
-            Log.Information("Receive server action request -> " + serverAction);
+            Log.Information("Client: Receive server action request {ServerAction} ", serverAction);
 
             switch (serverAction)
             {
                 case ServerAction.Removed:
-                    Log.Information("Daemon has been removed from the api.");
+                    Log.Information("Client: Daemon has been removed from the api");
                     _cancellationToken.Cancel();
                     break;
                 case ServerAction.Reconnect:
                 case ServerAction.Authentication:
-                    Log.Information("The daemon will reconnect ");
+                    Log.Information("Client: The daemon will reconnect");
                     Dispose();
                     RestartAuthentication();
                     break;
                 case ServerAction.Logout:
-                    Log.Information("The daemon receive logout request.");
+                    Log.Information("Client: The daemon receive logout request");
                     _cancellationToken.Cancel();
                     break;
             }
@@ -203,11 +207,11 @@ namespace Accessh.Daemon.Services
         /// <param name="response"></param>
         private void ServerErrorHandler(Response<string> response)
         {
-            Log.Error(response.Message);
+            Log.Error("Client: {Message}", response.Message);
 
             foreach (var error in response.Errors)
             {
-                Log.Error(error);
+                Log.Error("Client {Error}", error);
             }
 
             // Is daemon need to stop
@@ -226,7 +230,7 @@ namespace Accessh.Daemon.Services
             using var scope = _serviceProvider.CreateScope();
             var daemon = scope.ServiceProvider.GetService<IDaemonService>();
 
-            BackgroundJob.Schedule(() => daemon.StartAuthenticationTask(), TimeSpan.FromMinutes(1));
+            BackgroundJob.Enqueue(() => daemon.StartAuthenticationTask());
         }
     }
 }

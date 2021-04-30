@@ -54,7 +54,7 @@ namespace Accessh.Daemon
         /// Automatically executed after <see cref="StopAsync"/>
         public void Dispose()
         {
-            Log.Information("The daemon will close now.");
+            Log.Information("Host: The daemon will close now");
             _daemonService.Dispose();
         }
     }
