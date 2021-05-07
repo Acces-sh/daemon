@@ -1,8 +1,3 @@
-### Enhancement
+### Bug Fixes
 
-- The daemon tries to reconnect immediately after a connection loss instead of waiting for a minute
-
-### Other Notes
-
-- Update log messages
-- Update api url (Auth & Hub)
+- If the connection failed, the daemon did not make a new attempt. Now, the connection error is correctly reported, and the daemon will continue its attempts.

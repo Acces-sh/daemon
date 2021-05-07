@@ -96,7 +96,7 @@ namespace Accessh.Daemon.Services
                 {
                     var errorResponse = await JsonSerializer.DeserializeAsync
                         <Response<string[]>>(await response.Content.ReadAsStreamAsync(), serializerOption);
-                    
+
                     if (errorResponse != null)
                     {
                         ShowErrors(errorResponse.Errors);
@@ -120,7 +120,7 @@ namespace Accessh.Daemon.Services
                 Log.Information("Daemon: Authentication failed");
                 Log.Debug("Daemon: {Name}", e.GetType().Name);
                 Log.Debug("Daemon: {Message}", e.Message);
-                
+
                 if (e is HttpRequestException or JsonException ||
                     e is TaskCanceledException && e.InnerException is TimeoutException)
                 {
@@ -156,13 +156,12 @@ namespace Accessh.Daemon.Services
                 if (e is WebSocketException)
                 {
                     Log.Warning("Daemon: Connection failed ... Next attempt soon");
+                    throw;
                 }
-                else
-                {
-                    Log.Fatal("Daemon: A critical error has occurred");
-                    Log.Warning("Daemon: {Message}", e.Message);
-                    _cancellationToken.Cancel();
-                }
+
+                Log.Fatal("Daemon: A critical error has occurred");
+                Log.Warning("Daemon: {Message}", e.Message);
+                _cancellationToken.Cancel();
             }
         }
 
