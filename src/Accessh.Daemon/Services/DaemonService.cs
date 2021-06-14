@@ -15,6 +15,9 @@ using Serilog;
 
 namespace Accessh.Daemon.Services
 {
+    /// <summary>
+    /// Daemon service
+    /// </summary>
     public class DaemonService : IDaemonService
     {
         private readonly CancellationTokenSource _cancellationToken;
