@@ -230,7 +230,7 @@ namespace Accessh.Daemon.Services
             using var scope = _serviceProvider.CreateScope();
             var daemon = scope.ServiceProvider.GetService<IDaemonService>();
 
-            BackgroundJob.Enqueue(() => daemon.StartAuthenticationTask());
+            BackgroundJob.Schedule(() => daemon.StartAuthenticationTask(), TimeSpan.FromMinutes(1));
         }
     }
 }
