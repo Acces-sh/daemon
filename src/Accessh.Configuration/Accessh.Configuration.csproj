@@ -2,11 +2,11 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <LangVersion>9</LangVersion>
+        <LangVersion>latest</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Hangfire.Core" Version="1.7.19" />
+        <PackageReference Include="Hangfire.Core" Version="1.7.19"/>
     </ItemGroup>
 
 </Project>

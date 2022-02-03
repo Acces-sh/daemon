@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Accessh.Configuration;
 using Accessh.Configuration.Enums;
 using Accessh.Configuration.Interfaces;
-using Accessh.Configuration.Parameters;
+using Accessh.Configuration.Wrappers;
 using Hangfire;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.SignalR.Client;
@@ -67,7 +67,7 @@ namespace Accessh.Daemon.Services
         public void Dispose()
         {
             if (_connection == null) return;
-            
+
             try
             {
                 _connection.StopAsync().Wait(TimeSpan.FromSeconds(10));
@@ -75,7 +75,7 @@ namespace Accessh.Daemon.Services
             catch (Exception e)
             {
                 Log.Information("Client: The connection cannot be properly stopped");
-                Log.Debug("Client: {Message}",e.Message);
+                Log.Debug("Client: {Message}", e.Message);
                 throw;
             }
         }
@@ -86,11 +86,11 @@ namespace Accessh.Daemon.Services
         public void InitRoute()
         {
             _connection.Closed += async error => await ConnectionHandler(error);
-            _connection.On<bool, string[]>("AuthenticationStatus", AuthenticationHandler);
+            _connection.On<bool, ErrorResult<string>>("AuthenticationStatus", AuthenticationHandler);
             _connection.On<ServerAction>("ServerActions", ServerActionHandler);
             _connection.On<List<string>>("AddKeys", AddKeysHandler);
             _connection.On<List<string>>("RemoveKeys", RemoveKeysHandler);
-            _connection.On<Response<string>>("Error", ServerErrorHandler);
+            _connection.On<ErrorResult<string[]>>("Error", ServerErrorHandler);
         }
 
         /// <summary>
@@ -127,9 +127,10 @@ namespace Accessh.Daemon.Services
             {
                 Log.Debug("Client: Connection can't be disposed {Message}", e.Message);
             }
+
             Log.Information("Client: Attempt to reconnect ...");
             RestartAuthentication();
-            
+
             return Task.CompletedTask;
         }
 
@@ -137,16 +138,14 @@ namespace Accessh.Daemon.Services
         /// Handle authentication response from api
         /// </summary>
         /// <param name="status"></param>
-        /// <param name="messages"></param>
-        private void AuthenticationHandler(bool status, string[] messages)
+        /// <param name="error"></param>
+        private void AuthenticationHandler(bool status, ErrorResult<string> error)
         {
+            Log.Error("Client: Authentication failed");
+            Log.Error("Client: {Message}", error.Exception);
+            
             if (status) return;
 
-            Log.Error("Client: Authentication failed");
-            foreach (var message in messages)
-            {
-                Log.Error("Client: {Message}", message);
-            }
             _cancellationToken.Cancel();
         }
 
@@ -205,17 +204,18 @@ namespace Accessh.Daemon.Services
         /// Handler server errors
         /// </summary>
         /// <param name="response"></param>
-        private void ServerErrorHandler(Response<string> response)
+        private void ServerErrorHandler(ErrorResult<string[]> response)
         {
-            Log.Error("Client: {Message}", response.Message);
+            Log.Error("Client: {Message}", response.Exception);
 
-            foreach (var error in response.Errors)
+            foreach (var error in response.Messages)
             {
                 Log.Error("Client {Error}", error);
             }
 
+            // TODO: HANDLE SERVER STOP
             // Is daemon need to stop
-            if (response.RedirectNeeded == false) return;
+            // if (response.RedirectNeeded == false) return;
 
             _cancellationToken.Cancel();
         }

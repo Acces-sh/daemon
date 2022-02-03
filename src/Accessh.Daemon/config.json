@@ -1,4 +1,4 @@
 {
-  "AuthorizedKeyFilePath": "/root/.ssh/authorized_keys", 
-  "ApiToken": "YOUR_TOKEN"
+  "AuthorizedKeyFilePath": "E:/authorized_keys",
+  "ApiToken": "682e5c28463141c7a7a788b4a09eb52be6da7f3ba5454d0c8e0276821ba7e5af"
 }

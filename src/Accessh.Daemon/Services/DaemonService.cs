@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using Accessh.Configuration;
 using Accessh.Configuration.Exception;
 using Accessh.Configuration.Interfaces;
-using Accessh.Configuration.Parameters;
+using Accessh.Configuration.Wrappers;
 using Hangfire;
 using Serilog;
 
@@ -85,11 +85,11 @@ namespace Accessh.Daemon.Services
         /// Attempt to authentication to the remote server
         /// </summary>
         /// <returns></returns>
-        [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] {10, 30, 60, 120, 300})]
+        [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] { 10, 30, 60, 120, 300 })]
         public async Task StartAuthenticationTask()
         {
             Log.Information("Daemon: Authentication attempt with the acces.sh API");
-            var serializerOption = new JsonSerializerOptions {PropertyNameCaseInsensitive = true};
+            var serializerOption = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
 
             try
             {
@@ -98,19 +98,22 @@ namespace Accessh.Daemon.Services
                 if (response.IsSuccessStatusCode == false)
                 {
                     var errorResponse = await JsonSerializer.DeserializeAsync
-                        <Response<string[]>>(await response.Content.ReadAsStreamAsync(), serializerOption);
+                        <ErrorResult<string[]>>(await response.Content.ReadAsStreamAsync(), serializerOption);
 
-                    if (errorResponse != null)
-                    {
-                        ShowErrors(errorResponse.Errors);
-                        _cancellationToken.Cancel();
-                    }
+                    if (errorResponse == null) throw new HttpRequestException();
+
+                    if (errorResponse.Messages is not null)
+                        ShowErrors(errorResponse.Messages);
+                    else
+                        Log.Warning("Daemon: {Error}", errorResponse.Exception);
+                    
+                    _cancellationToken.Cancel();
 
                     throw new HttpRequestException();
                 }
 
                 var content = await JsonSerializer.DeserializeAsync
-                    <Response<string>>(await response.Content.ReadAsStreamAsync(), serializerOption);
+                    <Result<string>>(await response.Content.ReadAsStreamAsync(), serializerOption);
 
                 if (content == null) throw new Exception("Daemon: Authentication succeeded ");
 
@@ -142,7 +145,7 @@ namespace Accessh.Daemon.Services
         /// Attempt to connect to the remote server
         /// </summary>
         /// <returns></returns>
-        [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] {10, 30, 60, 120, 300})]
+        [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] { 10, 30, 60, 120, 300 })]
         public async Task StartConnectionTask()
         {
             Log.Information("Daemon: Connection attempt with the acces.sh API");
@@ -152,7 +155,7 @@ namespace Accessh.Daemon.Services
                 await _clientService.Connect();
                 Log.Information("Daemon: Success connection to acces.sh api");
                 _clientService.InitRoute();
-                _clientService.AskGetKeys();
+                // _clientService.AskGetKeys();
             }
             catch (Exception e)
             {

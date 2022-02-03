@@ -36,7 +36,7 @@ namespace Accessh.Daemon
                     .AddEnvironmentVariables()
                     .Build();
                 appConfiguration = InitializeAppConfiguration(configurationRoot);
-                
+
                 var configPath = appConfiguration.Mode == Mode.Docker
                     ? Directory.GetCurrentDirectory()
                     : appConfiguration.ConfigurationFilePath;

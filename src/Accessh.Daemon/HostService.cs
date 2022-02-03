@@ -15,12 +15,12 @@ namespace Accessh.Daemon
         private static readonly AutoResetEvent CloseRequested = new(false);
         private Task _work;
         private readonly IDaemonService _daemonService;
-        
+
         public HostService(IDaemonService daemonService)
         {
             _daemonService = daemonService;
         }
-        
+
         /// <summary>
         /// Run worker
         /// </summary>
@@ -42,12 +42,12 @@ namespace Accessh.Daemon
             CloseRequested.Set();
 
             if (_work == null) return Task.CompletedTask;
-            
+
             _work = null;
 
             return Task.CompletedTask;
         }
-        
+
         /// <summary>
         /// Dispose daemon
         /// </summary>

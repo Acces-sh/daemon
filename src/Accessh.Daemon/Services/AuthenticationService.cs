@@ -13,7 +13,7 @@ namespace Accessh.Daemon.Services
     /// </summary>
     public class AuthenticationService : IAuthenticationService
     {
-        private const string ServerAuthUri = "auth/server";
+        private const string ServerAuthUri = "server/authentication";
         private readonly string _serverUrl;
         private readonly string _apiToken;
 
@@ -22,7 +22,7 @@ namespace Accessh.Daemon.Services
             _apiToken = keyConfiguration.ApiToken;
             _serverUrl = configuration.ServerUrl;
         }
-        
+
         /// <summary>
         /// Performs an authentication request on the server 
         /// </summary>
@@ -32,10 +32,10 @@ namespace Accessh.Daemon.Services
         public async Task<HttpResponseMessage> Try()
         {
             var client = new HttpClient();
-            var bodyData = new {token = _apiToken};
-            
+            var bodyData = new { token = _apiToken };
+
             client.DefaultRequestHeaders.Add("User-Agent", "accessh-daemon-client");
-            
+
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
@@ -43,7 +43,7 @@ namespace Accessh.Daemon.Services
                 Content = new StringContent(JsonSerializer.Serialize(bodyData), Encoding.UTF8,
                     "application/json"),
             };
-            
+
             return await client.SendAsync(request);
         }
     }
