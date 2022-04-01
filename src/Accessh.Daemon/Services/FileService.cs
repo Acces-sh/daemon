@@ -8,12 +8,11 @@ using Accessh.Configuration;
 using Accessh.Configuration.Enums;
 using Accessh.Configuration.Exception;
 using Accessh.Configuration.Interfaces;
-using Serilog;
 
 namespace Accessh.Daemon.Services
 {
     /// <summary>
-    /// Authorized key file handler
+    ///     Authorized key file handler
     /// </summary>
     public class FileService : IFileService
     {
@@ -28,10 +27,7 @@ namespace Accessh.Daemon.Services
             {
                 var separator = "\\";
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false)
-                {
-                    separator = "/";
-                }
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) == false) separator = "/";
 
                 _keyFilePath = Directory.GetCurrentDirectory() + separator + FileName;
             }
@@ -42,7 +38,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Checks if the file can be read or written.
+        ///     Checks if the file can be read or written.
         /// </summary>
         /// <exception cref="FileNotFoundException">Authorized key file not found.</exception>
         /// <exception cref="FilePermissionException">Authorized keu file can't be read or written.</exception>
@@ -60,80 +56,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Add the ssh keys between Acces.sh tags in authorized_key file.
-        /// </summary>
-        /// <param name="keys">Keys to add</param>
-        /// <exception cref="ObjectDisposedException"></exception>
-        /// <exception cref="IOException">I/O error</exception>
-        private async Task Add(IList<string> keys)
-        {
-            var lines = (await File.ReadAllLinesAsync(_keyFilePath)).ToList();
-            var isHeaderFound = false;
-            var isFooterFound = false;
-            await using var stream = new StreamWriter(_keyFilePath);
-
-            foreach (var line in lines)
-            {
-                if (isHeaderFound == false && string.Equals(line.Trim(), FileHeader))
-                {
-                    isHeaderFound = true;
-                    await stream.WriteLineAsync(line);
-                    foreach (var key in keys)
-                    {
-                        await stream.WriteLineAsync(key);
-                    }
-
-                    continue;
-                }
-
-                if (isFooterFound == false && string.Equals(line.Trim(), FileFooter))
-                {
-                    isFooterFound = true;
-                }
-
-                await stream.WriteLineAsync(line);
-            }
-        }
-
-        /// <summary>
-        /// Remove ssh keys between Acces.sh tags in authorized_key file.
-        /// </summary>
-        /// <param name="keys">Keys to remove</param>
-        /// <exception cref="ObjectDisposedException"></exception>
-        /// <exception cref="IOException">I/O error</exception>
-        private async Task Remove(IList<string> keys)
-        {
-            var lines = (await File.ReadAllLinesAsync(_keyFilePath)).ToList();
-            var isHeaderFound = false;
-            var isFooterFound = false;
-            await using var stream = new StreamWriter(_keyFilePath);
-
-            foreach (var line in lines)
-            {
-                if (isHeaderFound == false && string.Equals(line.Trim(), FileHeader))
-                {
-                    isHeaderFound = true;
-                }
-
-                if (isFooterFound == false && string.Equals(line.Trim(), FileFooter))
-                {
-                    isFooterFound = true;
-                }
-
-                if (isHeaderFound && isFooterFound == false)
-                {
-                    if (keys.Contains(line))
-                    {
-                        continue;
-                    }
-                }
-
-                await stream.WriteLineAsync(line);
-            }
-        }
-
-        /// <summary>
-        /// Remove all keys between Acces.sh tags in authorized_key file.
+        ///     Remove all keys between Acces.sh tags in authorized_key file.
         /// </summary>
         /// <exception cref="ObjectDisposedException"></exception>
         /// <exception cref="IOException">I/O error</exception>
@@ -158,10 +81,7 @@ namespace Accessh.Daemon.Services
                     continue;
                 }
 
-                if (isHeaderFound && isFooterFound == false)
-                {
-                    continue;
-                }
+                if (isHeaderFound && isFooterFound == false) continue;
 
                 await stream.WriteLineAsync(line);
             }
@@ -170,10 +90,67 @@ namespace Accessh.Daemon.Services
             await stream.WriteLineAsync(FileFooter);
         }
 
+        /// <summary>
+        ///     Add the ssh keys between Acces.sh tags in authorized_key file.
+        /// </summary>
+        /// <param name="keys">Keys to add</param>
+        /// <exception cref="ObjectDisposedException"></exception>
+        /// <exception cref="IOException">I/O error</exception>
+        private async Task Add(IList<string> keys)
+        {
+            var lines = (await File.ReadAllLinesAsync(_keyFilePath)).ToList();
+            var isHeaderFound = false;
+            var isFooterFound = false;
+            await using var stream = new StreamWriter(_keyFilePath);
+
+            foreach (var line in lines)
+            {
+                if (isHeaderFound == false && string.Equals(line.Trim(), FileHeader))
+                {
+                    isHeaderFound = true;
+                    await stream.WriteLineAsync(line);
+                    foreach (var key in keys) await stream.WriteLineAsync(key);
+
+                    continue;
+                }
+
+                if (isFooterFound == false && string.Equals(line.Trim(), FileFooter)) isFooterFound = true;
+
+                await stream.WriteLineAsync(line);
+            }
+        }
+
+        /// <summary>
+        ///     Remove ssh keys between Acces.sh tags in authorized_key file.
+        /// </summary>
+        /// <param name="keys">Keys to remove</param>
+        /// <exception cref="ObjectDisposedException"></exception>
+        /// <exception cref="IOException">I/O error</exception>
+        private async Task Remove(IList<string> keys)
+        {
+            var lines = (await File.ReadAllLinesAsync(_keyFilePath)).ToList();
+            var isHeaderFound = false;
+            var isFooterFound = false;
+            await using var stream = new StreamWriter(_keyFilePath);
+
+            foreach (var line in lines)
+            {
+                if (isHeaderFound == false && string.Equals(line.Trim(), FileHeader)) isHeaderFound = true;
+
+                if (isFooterFound == false && string.Equals(line.Trim(), FileFooter)) isFooterFound = true;
+
+                if (isHeaderFound && isFooterFound == false)
+                    if (keys.Contains(line))
+                        continue;
+
+                await stream.WriteLineAsync(line);
+            }
+        }
+
         #region Jobs
 
         /// <summary>
-        /// Add keys job
+        ///     Add keys job
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>
@@ -184,7 +161,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Remove keys job
+        ///     Remove keys job
         /// </summary>
         /// <param name="keys"></param>
         /// <returns></returns>

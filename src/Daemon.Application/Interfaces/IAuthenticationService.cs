@@ -1,9 +1,9 @@
 ﻿using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace Accessh.Configuration.Interfaces;
+namespace Daemon.Application.Interfaces;
 
 public interface IAuthenticationService
 {
-    Task<HttpResponseMessage> Try();
+    Task<HttpResponseMessage> Authenticate();
 }

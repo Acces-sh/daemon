@@ -120,10 +120,7 @@ namespace Accessh.Daemon
             Validator.ValidateObject(keyConfiguration, new ValidationContext(keyConfiguration),
                 true);
 
-            if (appConfiguration.Mode == Mode.Docker)
-            {
-                keyConfiguration.ApiToken = tokenEnv;
-            }
+            if (appConfiguration.Mode == Mode.Docker) keyConfiguration.ApiToken = tokenEnv;
 
             return keyConfiguration;
         }

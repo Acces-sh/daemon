@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 
-namespace Accessh.Configuration.Interfaces;
+namespace Daemon.Application.Interfaces;
 
 public interface IResult
 {
-    List<string> Messages { get; set; }
+    List<string>? Messages { get; set; }
 
     bool Succeeded { get; set; }
 }

@@ -16,16 +16,16 @@ using Serilog;
 namespace Accessh.Daemon.Services
 {
     /// <summary>
-    /// Daemon service
+    ///     Daemon service
     /// </summary>
     public class DaemonService : IDaemonService
     {
-        private readonly CancellationTokenSource _cancellationToken;
         private readonly AppConfiguration _appConfiguration;
-        private readonly KeyConfiguration _keyConfiguration;
         private readonly IAuthenticationService _authenticationService;
+        private readonly CancellationTokenSource _cancellationToken;
         private readonly IClientService _clientService;
         private readonly IFileService _fileService;
+        private readonly KeyConfiguration _keyConfiguration;
 
         public DaemonService(CancellationTokenSource cancellationToken,
             AppConfiguration appConfiguration,
@@ -42,7 +42,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Entrypoint of daemon
+        ///     Entrypoint of daemon
         /// </summary>
         public void Worker()
         {
@@ -82,7 +82,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Attempt to authentication to the remote server
+        ///     Attempt to authentication to the remote server
         /// </summary>
         /// <returns></returns>
         [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] { 10, 30, 60, 120, 300 })]
@@ -106,7 +106,7 @@ namespace Accessh.Daemon.Services
                         ShowErrors(errorResponse.Messages);
                     else
                         Log.Warning("Daemon: {Error}", errorResponse.Exception);
-                    
+
                     _cancellationToken.Cancel();
 
                     throw new HttpRequestException();
@@ -128,10 +128,8 @@ namespace Accessh.Daemon.Services
                 Log.Debug("Daemon: {Message}", e.Message);
 
                 if (e is HttpRequestException or JsonException ||
-                    e is TaskCanceledException && e.InnerException is TimeoutException)
-                {
+                    (e is TaskCanceledException && e.InnerException is TimeoutException))
                     throw;
-                }
 
                 Log.Fatal("Daemon: A critical error has occurred");
                 _cancellationToken.Cancel();
@@ -142,7 +140,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Attempt to connect to the remote server
+        ///     Attempt to connect to the remote server
         /// </summary>
         /// <returns></returns>
         [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] { 10, 30, 60, 120, 300 })]
@@ -172,7 +170,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Dispose daemon service
+        ///     Dispose daemon service
         /// </summary>
         /// <returns></returns>
         public async Task Dispose()
@@ -190,15 +188,12 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Display errors in the console
+        ///     Display errors in the console
         /// </summary>
         /// <param name="errors"></param>
         private static void ShowErrors(IEnumerable<string> errors)
         {
-            foreach (var error in errors)
-            {
-                Log.Warning("Daemon: {Error}", error);
-            }
+            foreach (var error in errors) Log.Warning("Daemon: {Error}", error);
         }
     }
 }

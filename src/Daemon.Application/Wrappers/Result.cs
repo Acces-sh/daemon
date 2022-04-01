@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using Accessh.Configuration.Interfaces;
+using Daemon.Application.Interfaces;
 
-namespace Accessh.Configuration.Wrappers;
+namespace Daemon.Application.Wrappers;
 
 public class Result : IResult
 {
-    public List<string> Messages { get; set; }
+    public List<string>? Messages { get; set; }
     public bool Succeeded { get; set; }
 }
 

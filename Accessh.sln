@@ -10,6 +10,10 @@ ProjectSection(SolutionItems) = preProject
 	README.md = README.md
 EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemon.Host", "src\Daemon.Host\Daemon.Host.csproj", "{9129A916-3AA1-4BD3-877B-A715C38C2BEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemon.Application", "src\Daemon.Application\Daemon.Application.csproj", "{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{58584045-7D10-47B5-BD67-4C2AB0351268}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{58584045-7D10-47B5-BD67-4C2AB0351268}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{58584045-7D10-47B5-BD67-4C2AB0351268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9129A916-3AA1-4BD3-877B-A715C38C2BEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9129A916-3AA1-4BD3-877B-A715C38C2BEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9129A916-3AA1-4BD3-877B-A715C38C2BEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9129A916-3AA1-4BD3-877B-A715C38C2BEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

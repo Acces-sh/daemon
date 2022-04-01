@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
 
-namespace Accessh.Configuration.Interfaces
+namespace Accessh.Configuration.Interfaces;
+
+public interface IDaemonService
 {
-    public interface IDaemonService
-    {
-        void Worker();
-        Task StartAuthenticationTask();
-        Task StartConnectionTask();
-        Task Dispose();
-    }
+    void Worker();
+    Task StartAuthenticationTask();
+    Task StartConnectionTask();
+    Task Dispose();
 }

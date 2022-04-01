@@ -9,22 +9,24 @@ using Accessh.Configuration.Interfaces;
 namespace Accessh.Daemon.Services
 {
     /// <summary>
-    /// Authentication manager 
+    ///     Authentication manager
     /// </summary>
     public class AuthenticationService : IAuthenticationService
     {
         private const string ServerAuthUri = "servers/authentication";
-        private readonly string _serverUrl;
         private readonly string _apiToken;
+        private readonly string _serverUrl;
+        private readonly string _version;
 
         public AuthenticationService(AppConfiguration configuration, KeyConfiguration keyConfiguration)
         {
             _apiToken = keyConfiguration.ApiToken;
             _serverUrl = configuration.ServerUrl;
+            _version = configuration.Version;
         }
 
         /// <summary>
-        /// Performs an authentication request on the server 
+        ///     Performs an authentication request on the server
         /// </summary>
         /// <returns></returns>
         /// <exception cref="HttpRequestException"></exception>
@@ -32,7 +34,7 @@ namespace Accessh.Daemon.Services
         public async Task<HttpResponseMessage> Try()
         {
             var client = new HttpClient();
-            var bodyData = new { token = _apiToken };
+            var bodyData = new { Token = _apiToken, Version = _version };
 
             client.DefaultRequestHeaders.Add("User-Agent", "accessh-daemon-client");
 
@@ -41,7 +43,7 @@ namespace Accessh.Daemon.Services
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(_serverUrl + ServerAuthUri),
                 Content = new StringContent(JsonSerializer.Serialize(bodyData), Encoding.UTF8,
-                    "application/json"),
+                    "application/json")
             };
 
             return await client.SendAsync(request);

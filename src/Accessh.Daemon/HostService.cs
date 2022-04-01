@@ -8,13 +8,13 @@ using Serilog;
 namespace Accessh.Daemon
 {
     /// <summary>
-    /// Worker service
+    ///     Worker service
     /// </summary>
     public class HostService : IHostedService, IDisposable
     {
         private static readonly AutoResetEvent CloseRequested = new(false);
-        private Task _work;
         private readonly IDaemonService _daemonService;
+        private Task _work;
 
         public HostService(IDaemonService daemonService)
         {
@@ -22,7 +22,18 @@ namespace Accessh.Daemon
         }
 
         /// <summary>
-        /// Run worker
+        ///     Dispose daemon
+        /// </summary>
+        /// Automatically executed after
+        /// <see cref="StopAsync" />
+        public void Dispose()
+        {
+            Log.Information("Host: The daemon will close now");
+            _daemonService.Dispose();
+        }
+
+        /// <summary>
+        ///     Run worker
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -33,7 +44,7 @@ namespace Accessh.Daemon
         }
 
         /// <summary>
-        /// Stop worker
+        ///     Stop worker
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
@@ -46,16 +57,6 @@ namespace Accessh.Daemon
             _work = null;
 
             return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Dispose daemon
-        /// </summary>
-        /// Automatically executed after <see cref="StopAsync"/>
-        public void Dispose()
-        {
-            Log.Information("Host: The daemon will close now");
-            _daemonService.Dispose();
         }
     }
 }

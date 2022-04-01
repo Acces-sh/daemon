@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Accessh.Configuration.Interfaces;
+namespace Daemon.Application.Interfaces;
 
 public interface IFileService
 {
-    void CheckPermissions();
+    bool IsPermissionsCorrect();
     Task RemoveAll();
+    Task InitKeysJob(IList<string> keys);
     Task AddKeysJob(IList<string> keys);
     Task RemoveKeysJob(IList<string> keys);
 }

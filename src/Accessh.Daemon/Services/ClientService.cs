@@ -16,17 +16,15 @@ using Serilog;
 namespace Accessh.Daemon.Services
 {
     /// <summary>
-    /// Client service manages the websocket connection between the API and the daemon. 
+    ///     Client service manages the websocket connection between the API and the daemon.
     /// </summary>
     public class ClientService : IClientService
     {
+        private readonly AppConfiguration _appConfiguration;
         private readonly CancellationTokenSource _cancellationToken;
-        private HubConnection _connection;
         private readonly IFileService _fileService;
         private readonly IServiceProvider _serviceProvider;
-        private readonly AppConfiguration _appConfiguration;
-
-        public string Jwt { get; set; }
+        private HubConnection _connection;
 
         public ClientService(CancellationTokenSource cancellationToken, IFileService fileService,
             AppConfiguration configuration,
@@ -39,8 +37,10 @@ namespace Accessh.Daemon.Services
             _appConfiguration = configuration;
         }
 
+        public string Jwt { get; set; }
+
         /// <summary>
-        /// Attempt to connect to the Acces.sh API 
+        ///     Attempt to connect to the Acces.sh API
         /// </summary>
         public async Task Connect()
         {
@@ -62,7 +62,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// End the connection with the remote server
+        ///     End the connection with the remote server
         /// </summary>
         public void Dispose()
         {
@@ -81,7 +81,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Initialize route
+        ///     Initialize route
         /// </summary>
         public void InitRoute()
         {
@@ -94,7 +94,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Ask api to get ssh keys
+        ///     Ask api to get ssh keys
         /// </summary>
         public async void AskGetKeys()
         {
@@ -102,10 +102,21 @@ namespace Accessh.Daemon.Services
             await _connection.InvokeAsync("GetKeys");
         }
 
+        /// <summary>
+        ///     Performs a new authentication
+        /// </summary>
+        private void RestartAuthentication()
+        {
+            using var scope = _serviceProvider.CreateScope();
+            var daemon = scope.ServiceProvider.GetService<IDaemonService>();
+
+            BackgroundJob.Schedule(() => daemon.StartAuthenticationTask(), TimeSpan.FromMinutes(1));
+        }
+
         #region Handler
 
         /// <summary>
-        /// Handle connection loss 
+        ///     Handle connection loss
         /// </summary>
         /// <param name="error"></param>
         /// <returns></returns>
@@ -114,10 +125,7 @@ namespace Accessh.Daemon.Services
             Log.Warning(
                 "Client: The connection between the server and the client has been disrupted");
 
-            if (error != null)
-            {
-                Log.Debug("Client: {Message}", error.Message);
-            }
+            if (error != null) Log.Debug("Client: {Message}", error.Message);
 
             try
             {
@@ -135,7 +143,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Handle authentication response from api
+        ///     Handle authentication response from api
         /// </summary>
         /// <param name="status"></param>
         /// <param name="error"></param>
@@ -143,14 +151,14 @@ namespace Accessh.Daemon.Services
         {
             Log.Error("Client: Authentication failed");
             Log.Error("Client: {Message}", error.Exception);
-            
+
             if (status) return;
 
             _cancellationToken.Cancel();
         }
 
         /// <summary>
-        /// Add key job
+        ///     Add key job
         /// </summary>
         /// <param name="keys"></param>
         private void AddKeysHandler(IList<string> keys)
@@ -160,7 +168,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Run a key deletion job
+        ///     Run a key deletion job
         /// </summary>
         /// <param name="keys"></param>
         [AutomaticRetry(Attempts = 0)]
@@ -171,7 +179,7 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Handler for server action
+        ///     Handler for server action
         /// </summary>
         /// <param name="serverAction"></param>
         [AutomaticRetry(Attempts = 0)]
@@ -201,17 +209,14 @@ namespace Accessh.Daemon.Services
         }
 
         /// <summary>
-        /// Handler server errors
+        ///     Handler server errors
         /// </summary>
         /// <param name="response"></param>
         private void ServerErrorHandler(ErrorResult<string[]> response)
         {
             Log.Error("Client: {Message}", response.Exception);
 
-            foreach (var error in response.Messages)
-            {
-                Log.Error("Client {Error}", error);
-            }
+            foreach (var error in response.Messages) Log.Error("Client {Error}", error);
 
             // TODO: HANDLE SERVER STOP
             // Is daemon need to stop
@@ -221,16 +226,5 @@ namespace Accessh.Daemon.Services
         }
 
         #endregion
-
-        /// <summary>
-        /// Performs a new authentication
-        /// </summary>
-        private void RestartAuthentication()
-        {
-            using var scope = _serviceProvider.CreateScope();
-            var daemon = scope.ServiceProvider.GetService<IDaemonService>();
-
-            BackgroundJob.Schedule(() => daemon.StartAuthenticationTask(), TimeSpan.FromMinutes(1));
-        }
     }
 }

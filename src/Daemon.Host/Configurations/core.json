@@ -1,0 +1,9 @@
+{
+  "Core": {
+    "Version": "2.0.0",
+    "HubUrl": "https://localhost:5001/v1/Hub/Server",
+    "ServerUrl": "https://localhost:5001/v1/",
+    "ConfigurationFilePath": "E:/Projects/Accessh/daemon/src/Daemon.Host/bin/Debug/net6.0/",
+    "Mode": "0"
+  }
+}

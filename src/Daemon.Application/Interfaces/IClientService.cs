@@ -1,12 +1,11 @@
 ﻿using System.Threading.Tasks;
 
-namespace Accessh.Configuration.Interfaces;
+namespace Daemon.Application.Interfaces;
 
 public interface IClientService
 {
     string Jwt { set; }
     Task Connect();
     void Dispose();
-    void InitRoute();
-    void AskGetKeys();
+    void Init();
 }
