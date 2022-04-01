@@ -83,7 +83,6 @@ public class ClientService : IClientService
         _connection!.Closed += async error => await ConnectionHandler(error);
         _connection!.On<bool, ErrorResult<string>>("AuthenticationStatus", AuthenticationHandler);
         
-        // Add KEYS
         _connection!.On<List<string>>("InitKeys", InitKeysHandler);
         _connection!.On<List<string>>("AddKeys", AddKeysHandler);
         _connection.On<List<string>>("RemoveKeys", RemoveKeysHandler);
@@ -155,7 +154,7 @@ public class ClientService : IClientService
     private void InitKeysHandler(IList<string> keys)
     {
         Log.Information("Client: Receive action -> Init keys");
-        BackgroundJob.Enqueue(() => _fileService.RemoveKeysJob(keys));
+        BackgroundJob.Enqueue(() => _fileService.InitKeysJob(keys));
     }
     
     /// <summary>

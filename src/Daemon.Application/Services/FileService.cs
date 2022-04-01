@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using Daemon.Application.Common;
 using Daemon.Application.Interfaces;
 using Daemon.Application.Settings;
-using Microsoft.Extensions.Configuration;
 
 namespace Daemon.Application.Services;
 
@@ -93,6 +92,7 @@ public class FileService : IFileService
     private async Task Add(IList<string> keys)
     {
         var lines = (await File.ReadAllLinesAsync(_keyFilePath)).ToList();
+
         var isHeaderFound = false;
         var isFooterFound = false;
         await using var stream = new StreamWriter(_keyFilePath);
@@ -103,7 +103,7 @@ public class FileService : IFileService
             {
                 isHeaderFound = true;
                 await stream.WriteLineAsync(line);
-                foreach (var key in keys) await stream.WriteLineAsync(key);
+                foreach (var key in keys.Where(k => !lines.Contains(k.Trim()))) await stream.WriteLineAsync(key);
 
                 continue;
             }
@@ -142,28 +142,18 @@ public class FileService : IFileService
     }
 
     #region Jobs
-    
+
     public async Task InitKeysJob(IList<string> keys)
     {
         await RemoveAll();
         await Add(keys);
     }
 
-    /// <summary>
-    ///     Add keys job
-    /// </summary>
-    /// <param name="keys"></param>
-    /// <returns></returns>
     public async Task AddKeysJob(IList<string> keys)
-    { 
+    {
         await Add(keys);
     }
 
-    /// <summary>
-    ///     Remove keys job
-    /// </summary>
-    /// <param name="keys"></param>
-    /// <returns></returns>
     public async Task RemoveKeysJob(IList<string> keys)
     {
         await Remove(keys);
