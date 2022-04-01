@@ -53,6 +53,7 @@ public static class Startup
         services.AddSingleton<IAuthenticationService, AuthenticationService>();
         services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<IClientService, ClientService>();
+        services.AddSingleton<IDaemonService, DaemonService>();
         
         // Configuration
         services.AddSingleton(_appConfiguration);

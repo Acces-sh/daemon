@@ -18,7 +18,7 @@ try
     });
     builder.ConfigureServices(services =>
     {
-        services.AddHostedService<DaemonWorker>();
+        services.AddHostedService<Worker>();
         services.AddInfrastructure();
         services.Configure<HostOptions>(opts => opts.ShutdownTimeout = TimeSpan.FromSeconds(15));
     });

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 using Accessh.Configuration.Enums;
 using Daemon.Application.Interfaces;
@@ -21,17 +20,17 @@ public class ClientService : IClientService
     private readonly AppConfiguration _configuration;
     private readonly IFileService _fileService;
     private readonly IServiceProvider _serviceProvider;
-    private HubConnection? _connection;
     private readonly IHostApplicationLifetime _hostApplicationLifetime;
-
+    
+    private HubConnection? _connection;
     public string Jwt { get; set; }
  
-    public ClientService(AppConfiguration configuration, IFileService fileService, IServiceProvider serviceProvider,IHostApplicationLifetime hostApplicationLifetime)
+    public ClientService(AppConfiguration configuration, IFileService fileService, IHostApplicationLifetime hostApplicationLifetime, IServiceProvider serviceProvider)
     {
         _configuration = configuration;
         _fileService = fileService;
-        _serviceProvider = serviceProvider;
         _hostApplicationLifetime = hostApplicationLifetime;
+        _serviceProvider = serviceProvider;
         Jwt = "";
     }
     
@@ -99,9 +98,9 @@ public class ClientService : IClientService
     private void RestartAuthentication()
     {
         using var scope = _serviceProvider.CreateScope();
-        var worker = scope.ServiceProvider.GetService<IDaemonWorker>();
-
-        BackgroundJob.Schedule(() => worker!.StartAuthenticationTask(), TimeSpan.FromMinutes(1));
+        var daemon = scope.ServiceProvider.GetService<IDaemonService>();
+        
+        BackgroundJob.Schedule(() =>daemon!.StartAuthenticationTask(), TimeSpan.FromMinutes(1));
     }
     
     #region Handler
@@ -145,10 +144,7 @@ public class ClientService : IClientService
 
         if (status) return;
         
-        using var scope = _serviceProvider.CreateScope();
-        var worker = scope.ServiceProvider.GetService<IDaemonWorker>();
-
-        worker!.StopApplication();
+        _hostApplicationLifetime.StopApplication();
     }
     
     /// <summary>
@@ -192,16 +188,11 @@ public class ClientService : IClientService
     {
         Log.Information("Client: Receive server action request {ServerAction} ", serverAction);
         
-        using var scope = _serviceProvider.CreateScope();
-        var worker = scope.ServiceProvider.GetService<IDaemonWorker>();
-
         switch (serverAction)
         {
             case ServerAction.Removed:
                 Log.Information("Client: Daemon has been removed from the api");
-                // worker!.StopApplication();
                 _hostApplicationLifetime.StopApplication();
-                // _cancellationToken.Cancel();
                 break;
             case ServerAction.Reconnect:
             case ServerAction.Authentication:
@@ -230,10 +221,8 @@ public class ClientService : IClientService
             foreach (var error in response.Messages)
                 Log.Error("Client {Error}", error);
 
-        using var scope = _serviceProvider.CreateScope();
-        var worker = scope.ServiceProvider.GetService<IDaemonWorker>();
-
-        worker!.StopApplication();
+        _hostApplicationLifetime.StopApplication();
     }
+    
     #endregion
 }

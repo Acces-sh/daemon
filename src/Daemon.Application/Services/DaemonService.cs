@@ -1,30 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net.Http;
 using System.Net.WebSockets;
 using System.Text.Json;
+using System.Threading.Tasks;
 using Daemon.Application.Interfaces;
 using Daemon.Application.Responses;
 using Daemon.Application.Wrappers;
 using Hangfire;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 
-namespace Daemon.Host;
+namespace Daemon.Application.Services;
 
-public class DaemonWorker : BackgroundService, IDaemonWorker, IDisposable
+public class DaemonService : IDaemonService
 {
     private readonly IHostApplicationLifetime _applicationLifetime;
-    private readonly IAuthenticationService _authenticationService;
     private readonly IFileService _fileService;
-    private IClientService _clientService;
+    private readonly IAuthenticationService _authenticationService;
+    private readonly IClientService _clientService;
 
-    public DaemonWorker(IHostApplicationLifetime applicationLifetime, IAuthenticationService authenticationService,
-        IFileService fileService, IClientService clientService)
+    public DaemonService(IHostApplicationLifetime applicationLifetime, IFileService fileService, IAuthenticationService authenticationService, IClientService clientService)
     {
         _applicationLifetime = applicationLifetime;
-        _authenticationService = authenticationService;
         _fileService = fileService;
+        _authenticationService = authenticationService;
         _clientService = clientService;
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    public void Worker()
     {
         try
         {
@@ -51,9 +56,9 @@ public class DaemonWorker : BackgroundService, IDaemonWorker, IDisposable
 
             _applicationLifetime.StopApplication();
         }
-
-        return Task.CompletedTask;
+        
     }
+    
 
     [AutomaticRetry(Attempts = 10000, DelaysInSeconds = new[] { 10, 30, 60, 300, 600, 1800 })]
     public async Task StartAuthenticationTask()
@@ -106,10 +111,11 @@ public class DaemonWorker : BackgroundService, IDaemonWorker, IDisposable
 
             Log.Fatal("Daemon: A critical error has occurred");
 
-            StopApplication();
+            _applicationLifetime.StopApplication();
         }
     }
     
+      
     /// <summary>
     ///     Attempt to connect to the remote server
     /// </summary>
@@ -136,38 +142,13 @@ public class DaemonWorker : BackgroundService, IDaemonWorker, IDisposable
             Log.Fatal("Daemon: A critical error has occurred");
             Log.Warning("Daemon: {Message}", e.Message);
             
-            StopApplication();
+            _applicationLifetime.StopApplication();
         }
     }
     
-    public async void Dispose()
-    {
-        Log.Information("Host: The daemon will close now");
-        try
-        {
-            await _fileService.RemoveAll();
-            _clientService.Dispose();
-        }
-        catch (Exception e)
-        {
-            Log.Warning("Daemon: The authorized key file could not be emptied. Please check the file");
-            Log.Debug("Daemon: {Message}", e.Message);
-        }
-    }
-
-
-    public void StopApplication()
-    {
-        _applicationLifetime.StopApplication();
-    }
-
     private static void ShowErrors(IEnumerable<string>? errors)
     {
-        if (errors is null)
-        {
-            Log.Error("There is no message error..");
-            return;
-        }
+        if (errors is null) return; 
 
         foreach (var error in errors) Log.Warning("Daemon: {Error}", error);
     }

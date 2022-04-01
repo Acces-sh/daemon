@@ -2,8 +2,9 @@
 
 namespace Daemon.Application.Interfaces;
 
-public interface IDaemonWorker
+public interface IDaemonService
 {
+    void Worker();
     Task StartAuthenticationTask();
-    void StopApplication();
+    Task StartConnectionTask();
 }
