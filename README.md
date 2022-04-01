@@ -10,7 +10,7 @@ The complete list of changes is available [here](CHANGELOG.md)
 
 To build the Daemon you need:
 
-- [.net](https://dotnet.microsoft.com/download) SDK 5.0.1
+- [.net](https://dotnet.microsoft.com/download) SDK 6.0.0
 
 To start working on the Daemon, you can build the main branch:
 

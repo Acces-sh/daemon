@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-daemon_version=1.0.4
+daemon_version=2.0.0
 sudo_cmd=''
 restart_cmd="$sudo_cmd systemctl restart sh-daemon"
 config_location=/etc/sh-daemon/config.json
