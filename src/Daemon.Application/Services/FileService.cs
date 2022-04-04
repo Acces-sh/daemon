@@ -134,7 +134,7 @@ public class FileService : IFileService
             if (isFooterFound == false && string.Equals(line.Trim(), FileFooter)) isFooterFound = true;
 
             if (isHeaderFound && isFooterFound == false)
-                if (keys.Contains(line))
+                if (keys.Contains(line.Trim()))
                     continue;
 
             await stream.WriteLineAsync(line);

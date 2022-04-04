@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Accessh.Configuration.Enums;
 using Daemon.Application.Interfaces;
@@ -154,7 +155,7 @@ public class ClientService : IClientService
     private void InitKeysHandler(IList<string> keys)
     {
         Log.Information("Client: Receive action -> Init keys");
-        BackgroundJob.Enqueue(() => _fileService.InitKeysJob(keys));
+        BackgroundJob.Enqueue(() => _fileService.InitKeysJob(keys.Select(k => k.Trim()).ToList()));
     }
     
     /// <summary>
@@ -164,7 +165,7 @@ public class ClientService : IClientService
     private void AddKeysHandler(IList<string> keys)
     {
         Log.Information("Client: Receive action -> Add keys");
-        BackgroundJob.Enqueue(() => _fileService.AddKeysJob(keys));
+        BackgroundJob.Enqueue(() => _fileService.AddKeysJob(keys.Select(k => k.Trim()).ToList()));
     }
     
     /// <summary>
@@ -175,7 +176,7 @@ public class ClientService : IClientService
     private void RemoveKeysHandler(IList<string> keys)
     {
         Log.Information("Client: Receive action -> Remove keys");
-        BackgroundJob.Enqueue(() => _fileService.RemoveKeysJob(keys));
+        BackgroundJob.Enqueue(() => _fileService.RemoveKeysJob(keys.Select(k => k.Trim()).ToList()));
     }
     
     /// <summary>
