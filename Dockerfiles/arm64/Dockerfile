@@ -11,10 +11,10 @@ RUN dotnet restore Daemon.Host/Daemon.Host.csproj -r linux-musl-x64
 COPY . .
 RUN rm src/Daemon.Host/Configurations/core.json
 RUN mv src/Daemon.Host/Configurations/core.docker.json src/Daemon.Host/Configurations/core.json
-RUN dotnet publish -c release -o /app -r linux-musl-x64 --self-contained false /p:PublishTrimmed=false /p:PublishReadyToRun=true
+RUN dotnet publish -c release -o /app -r linux-arm64 --self-contained false /p:PublishTrimmed=false
 
 # final stage/image
-FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine-amd64
+FROM mcr.microsoft.com/dotnet/aspnet:6.0-alpine-arm64v8
 WORKDIR /app
 COPY --from=build /app .
 RUN touch /app/authorized_keys
