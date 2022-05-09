@@ -1,9 +1,10 @@
 Package: sh-daemon
-Version: 1.0.4
+Version: 2.0.0
 Section: custom
 Priority: optional
 Architecture: all
-Essential: no
-Maintainer: Karim Moussaoui <karim.moussaoui@acces.sh>
+Homepage: https://github.com/Acces-sh/daemon
+Maintainer: Acces.sh Daemon team <daemon-team@acces.sh>
+Bugs: https://github.com/Acces-sh/daemon/issues
 Description: Acces.sh daemon
  Synchronize ssh access via your ssh keys
