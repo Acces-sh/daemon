@@ -2,7 +2,7 @@ Package: sh-daemon
 Version: 2.0.0
 Section: custom
 Priority: optional
-Architecture: all
+Architecture: CUSTOM_ARCH
 Homepage: https://github.com/Acces-sh/daemon
 Maintainer: Acces.sh Daemon team <daemon-team@acces.sh>
 Bugs: https://github.com/Acces-sh/daemon/issues
