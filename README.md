@@ -24,3 +24,17 @@ To start working on the Daemon, you can build the main branch:
 ` "ConfigurationFilePath": "ABSOLUTE_PATH_OF_PROJECT/src/Daemon.Host/bin/Debug/net6.0/"`
 6. Build the Daemon with `dotnet build`
 7. Run Daemon with `dotnet run`
+
+
+## Run with Docker compose
+
+```
+version: "3.9"
+services:
+  daemon:
+    image: ghcr.io/acces-sh/daemon
+    volumes:
+      - "/root/.ssh/authorized_keys:/app/authorized_keys/"
+    environment:
+      API_TOKEN: "YOUR_TOKEN"
+```
