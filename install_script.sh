@@ -6,7 +6,6 @@ sudo_cmd=''
 restart_cmd="$sudo_cmd systemctl restart sh-daemon"
 config_location=/etc/sh-daemon/config.json
 arch=$(dpkg --print-architecture)
-arch_supported=("amd64" "armhf" "arm64")
 
 echo -e "* Acces.sh Daemon install script"
 echo -e "* Version $daemon_version"
@@ -17,7 +16,7 @@ if (( $EUID != 0 )); then
     sudo_cmd='sudo'
 fi
 
-if [[ ${arch_supported[*]} -ne $arch ]]
+if [ "${arch}" != "amd64" ] && [ "${arch}" != "arm64" ] && [ "${arch}" != "armhf" ]
 then
   echo -e "\e[31mThe current architecture isn't supported\e[0m"
   exit 1;
@@ -27,7 +26,7 @@ echo -e "\e[36m# Retrieving the latest version of the daemon\e[0m"
 
 rm -f shdaemon_$daemon_version-1_"$arch".deb
 
-curl -O -J -L https://github.com/Acces-sh/daemon-test/releases/download/v$daemon_version/shdaemon_$daemon_version-1_$arch.deb
+curl -O -J -L https://github.com/Acces-sh/daemon/releases/download/v$daemon_version/shdaemon_$daemon_version-1_$arch.deb
 
 echo -e "\e[36m# Installing daemon...\e[0m"
 
