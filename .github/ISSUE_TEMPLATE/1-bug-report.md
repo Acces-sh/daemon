@@ -8,7 +8,6 @@ body:
   attributes:
   value: |
   Please [search for existing issues](https://github.com/Acces-sh/daemon/issues) before creating a new one.
-  If you'd like to create a new bug report, please [read the guidance here](https://github.com/Acces-sh/daemon/blob/master/CONTRIBUTING.md) before getting started. This will save you time.
 
 - type: input
   attributes:
