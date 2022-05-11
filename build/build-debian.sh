@@ -16,42 +16,46 @@ extension=""
 # Build
 cd build
 
-if(($2 == "linux-x64"))
+if [[ "$2" == "linux-x64" ]]
 then
-  dotnet publish ../src/Accessh.Daemon/Accessh.Daemon.csproj -c Release -o ./app -r linux-x64 --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true
+  dotnet publish ../src/Daemon.Host/Daemon.Host.csproj -c Release -o ./app -r linux-x64 --self-contained true -p:PublishSingleFile=true
   extension="amd64"
-elif(($2 == "linux-arm"))
+elif [[ "$2" == "linux-arm" ]]
 then
-  dotnet publish ../src/Accessh.Daemon/Accessh.Daemon.csproj -c Release -o ./app -r linux-arm --self-contained true -p:PublishSingleFile=true
-  extension="arm"
-elif(($2 == "linux-arm64"))
+  dotnet publish ../src/Daemon.Host/Daemon.Host.csproj -c Release -o ./app -r linux-arm --self-contained true -p:PublishSingleFile=true
+  extension="armhf"
+elif [[ "$2" == "linux-arm64" ]]
 then
-  dotnet publish ../src/Accessh.Daemon/Accessh.Daemon.csproj -c Release -o ./app -r linux-arm64 --self-contained true -p:PublishSingleFile=true
+  dotnet publish ../src/Daemon.Host/Daemon.Host.csproj -c Release -o ./app -r linux-arm64 --self-contained true -p:PublishSingleFile=true
   extension="arm64"
 else 
   echo "Incorrect build type"
   exit 1
 fi
 
+cp -r ./deb ./deb-build
+
 # Move app
-mv app/* ./deb/opt/sh-daemon/
-mv ./deb/opt/sh-daemon/config.json ./deb/etc/sh-daemon/config.json
+mv app/* ./deb-build/opt/sh-daemon/
+mv ./deb-build/opt/sh-daemon/config.json ./deb-build/etc/sh-daemon/config.json
 
 # Update architecture type
-sed -i "s/CUSTOM_ARCH/${extension}/g" deb/DEBIAN/control
+sed -i "s/CUSTOM_ARCH/${extension}/g" deb-build/DEBIAN/control
 
 # Cleanup
-rm -f deb/opt/sh-daemon/.gitkeep
-rm -f deb/etc/sh-daemon/.gitkeep
+rm -f deb-build/opt/sh-daemon/.gitkeep
+rm -f deb-build/etc/sh-daemon/.gitkeep
 
 # Set permission
-chmod 755 -R deb
+chmod 755 -R deb-build
 
 # Create debian package
-dpkg-deb --build deb
+dpkg-deb --build deb-build
 
 # Finalize
-mv deb.deb shdaemon_"$1"-1_${extension}.deb
-rm -rf app/
+mv deb-build.deb shdaemon_"$1"-1_${extension}.deb
 
+rm -rf deb-build/
+
+cd ..
 echo The Debian package has been created

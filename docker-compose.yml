@@ -11,7 +11,7 @@ services:
   daemon-dev:
     build:
       context: ./
-      dockerfile: ./Dockerfiles/amd64/Dockerfile
+      dockerfile: ./Dockerfiles/multi/Dockerfile
     volumes:
       - "./authorized_keys:/app/authorized_keys"
     environment:

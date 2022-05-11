@@ -22,19 +22,19 @@ public static class Startup
         _appConfiguration = InitializeCoreConfiguration(config);
         var configPath = _appConfiguration.Core.Mode == Mode.Docker ? Directory.GetCurrentDirectory()
             : _appConfiguration.Core.ConfigurationFilePath;
-            
-        config = new ConfigurationBuilder()
-            .AddJsonFile($"{configurationsDirectory}/core.json", false, true)
-            .AddJsonFile($"{configurationsDirectory}/logger.json", false, true)
-            .SetBasePath(configPath).AddJsonFile("config.json")
-            .AddEnvironmentVariables().Build();
         
+        config = new ConfigurationBuilder()
+            .AddJsonFile($"{Directory.GetCurrentDirectory()}/{configurationsDirectory}/core.json", false, true)
+            .AddJsonFile($"{Directory.GetCurrentDirectory()}/{configurationsDirectory}/logger.json", false, true)
+            .AddJsonFile($"{configPath}/config.json")
+            .AddEnvironmentVariables().Build();
+
         host.ConfigureHostConfiguration(builder =>
         {
             builder.AddConfiguration(config);
         } );
         
-        _appConfiguration= InitializeCoreConfiguration(config);
+        _appConfiguration = InitializeCoreConfiguration(config);
 
         return config;
     }
@@ -68,6 +68,11 @@ public static class Startup
         configurationRoot.Bind(modeConfiguration);
         Validator.ValidateObject(modeConfiguration, new ValidationContext(modeConfiguration),
             true);
+        
+        if (modeConfiguration.Core.Mode == Mode.Docker)
+        {
+            modeConfiguration.ApiToken = Environment.GetEnvironmentVariable("API_TOKEN")!;
+        }
 
         return modeConfiguration;
     }

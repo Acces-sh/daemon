@@ -16,4 +16,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Daemon.Application\Daemon.Application.csproj" />
     </ItemGroup>
+
+    <PropertyGroup>
+        <InvariantGlobalization>true</InvariantGlobalization>
+    </PropertyGroup>
 </Project>

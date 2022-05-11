@@ -21,7 +21,7 @@ public class AuthenticationService : IAuthenticationService
     public async Task<HttpResponseMessage> Authenticate()
     {
         var client = new HttpClient();
-        var bodyData = new { Token = _configuration.ApiToken!, Version = _configuration.Core.Version! };
+        var bodyData = new { Token = _configuration.ApiToken.Trim(), Version = _configuration.Core.Version! };
 
         client.DefaultRequestHeaders.Add("User-Agent", "accessh-daemon-client");
 
