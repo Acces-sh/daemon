@@ -1,5 +1,8 @@
 # Acces.sh daemon
 
+[![Create release](https://github.com/Acces-sh/daemon/actions/workflows/release.yml/badge.svg)](https://github.com/Acces-sh/daemon/actions/workflows/release.yml)
+[![Build Docker Images](https://github.com/Acces-sh/daemon/actions/workflows/docker.yml/badge.svg)](https://github.com/Acces-sh/daemon/actions/workflows/release.yml)
+
 Welcome to the acces.sh daemon repository. Binaries for Debian distributions are distributed in the release section.
 
 ## Changelog

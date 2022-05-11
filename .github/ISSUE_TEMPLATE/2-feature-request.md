@@ -2,7 +2,7 @@
 name: 🚀 Daemon - Feature request
 about: Suggest a feature 
 title: ''
-labels: 'feature'
+labels: 'enhancement'
 assignees: ''
 
 ---
