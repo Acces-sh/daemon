@@ -1,6 +1,6 @@
 ---
-name: 🐞 Daemon -  Bug report
-description: Report a bug on Windows Subsystem for Linux
+name: 🐞 Daemon - Bug report
+description: Report a bug
 title: "[Bug]"
 labels: bug
 body:
