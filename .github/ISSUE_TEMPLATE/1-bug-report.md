@@ -14,7 +14,7 @@ body:
   attributes:
   label: Version
   description: |
-  Docker : Please run `docker image inspect ghcr.io/acces-sh/daemon-test` and check `"org.opencontainers.image.version":"X.X.X"`
+  Docker : Please run `docker image inspect ghcr.io/acces-sh/daemon` and check `"org.opencontainers.image.version":"X.X.X"`
   Linux : Please run `cat /etc/sh-daemon/Configurations/core.json` and check `"Version": "2.0.0",`
   placeholder: "2.0.0"
   validations:
@@ -24,7 +24,7 @@ body:
   attributes:
   label: Mode
   description: |
-  Tell us whether the issue is on WSL 2 and/or WSL 1. You can tell your WSL version by running `wsl -l -v`.
+  Tell us whether the issue is on Docker and/or Linux Package.
   options:
   - label: "Docker image"
   - label: "Linux package"
@@ -42,11 +42,9 @@ body:
 - type: textarea
   attributes:
   label: Other Software
-  description: If you're reporting a bug involving WSL's interaction with other applications, please tell us. What applications? What versions?
+  description: If you're reporting a bug involving Daemon's interaction with other applications, please tell us. What applications ? What versions ?
   placeholder: |
-  Docker Desktop (Windows), version 3.2.2
-  traceroute, Version: 1:2.0.21-1
-  Visual Studio Code 1.54.3 with Remote-WSL Extension 0.54.6
+  OpenSSH
   MyCustomApplication
   validations:
   required: false
