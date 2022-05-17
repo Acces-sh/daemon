@@ -1,6 +1,6 @@
 # Release Notes
 
-## v2.0
+## v2.0 (17/05/2022)
 
 ### Features
 
