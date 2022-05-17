@@ -33,5 +33,5 @@ jobs:
             build/shdaemon_${{ github.event.inputs.version }}-1_armhf.deb
             build/shdaemon_${{ github.event.inputs.version }}-1_arm64.deb
             install_script.sh
-          body_path: releasesnotes/NOTES.md
+          body: Please refer to [CHANGELOG.md](https://github.com/Acces-sh/daemon) for details.
           token: ${{ secrets.CR_PAT }}
