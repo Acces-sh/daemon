@@ -6,3 +6,4 @@ obj/
 app/
 authorized_key
 build/app
+build/deb-build/*

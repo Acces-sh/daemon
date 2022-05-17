@@ -1,14 +1,14 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accessh.Daemon", "src\Accessh.Daemon\Accessh.Daemon.csproj", "{5F9DDD01-9D96-45F0-A59F-3F78FB4C5CAE}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Accessh.Configuration", "src\Accessh.Configuration\Accessh.Configuration.csproj", "{58584045-7D10-47B5-BD67-4C2AB0351268}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Other", "Other", "{C70D5E60-013E-4A31-BC0A-3B0127BE981A}"
 ProjectSection(SolutionItems) = preProject
 	docker-compose.yml = docker-compose.yml
 	README.md = README.md
 EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemon.Host", "src\Daemon.Host\Daemon.Host.csproj", "{9129A916-3AA1-4BD3-877B-A715C38C2BEC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemon.Application", "src\Daemon.Application\Daemon.Application.csproj", "{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -16,13 +16,13 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5F9DDD01-9D96-45F0-A59F-3F78FB4C5CAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5F9DDD01-9D96-45F0-A59F-3F78FB4C5CAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5F9DDD01-9D96-45F0-A59F-3F78FB4C5CAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5F9DDD01-9D96-45F0-A59F-3F78FB4C5CAE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{58584045-7D10-47B5-BD67-4C2AB0351268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{58584045-7D10-47B5-BD67-4C2AB0351268}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{58584045-7D10-47B5-BD67-4C2AB0351268}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{58584045-7D10-47B5-BD67-4C2AB0351268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9129A916-3AA1-4BD3-877B-A715C38C2BEC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9129A916-3AA1-4BD3-877B-A715C38C2BEC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9129A916-3AA1-4BD3-877B-A715C38C2BEC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9129A916-3AA1-4BD3-877B-A715C38C2BEC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E44C20D-6FE6-4622-9F13-4A332E46FBAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

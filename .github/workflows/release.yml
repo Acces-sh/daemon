@@ -1,58 +1,37 @@
 name: Create release
+
 on:
-  workflow_dispatch:
+  workflow_dispatch: 
     inputs:
       version:
-        description: 'Name of version  (ie 1.0.1)'
+        description: 'Version (ex 1.0.1)'
         required: true
-
-jobs:
-  publish-docker:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Copy Repo Files
-        uses: actions/checkout@v2
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v1
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
-      - name: Cache Docker layers
-        uses: actions/cache@v2
-        with:
-          path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ github.sha }}
-          restore-keys: ${{ runner.os }}-buildx-
-      - name: Publish Docker Image
-        uses: docker/build-push-action@v2
-        with:
-          tags: ghcr.io/acces-sh/daemon:latest,ghcr.io/acces-sh/daemon:${{ github.event.inputs.version }}
-          context: ./
-          file: ./Dockerfiles/amd64/Dockerfile
-          push: true
-
+        
+jobs:        
   publish-debian:
     runs-on: ubuntu-latest
     steps:
       - name: Copy Repo Files
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
       - name: Setup dotnet
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '5.0.100'
-      - run: bash build/build-debian.sh ${{ github.event.inputs.version }}
+          dotnet-version: '6.0.x'
+          
+      - run: |
+          bash build/build-debian.sh ${{ github.event.inputs.version }} linux-x64        
+          bash build/build-debian.sh ${{ github.event.inputs.version }} linux-arm
+          bash build/build-debian.sh ${{ github.event.inputs.version }} linux-arm64
+
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: v${{ github.event.inputs.version }}
           files: |
             build/shdaemon_${{ github.event.inputs.version }}-1_amd64.deb
+            build/shdaemon_${{ github.event.inputs.version }}-1_armhf.deb
+            build/shdaemon_${{ github.event.inputs.version }}-1_arm64.deb
             install_script.sh
-          body_path: releasesnotes/NOTES.md
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          body: Please refer to [CHANGELOG.md](https://github.com/Acces-sh/daemon) for details.
+          token: ${{ secrets.CR_PAT }}

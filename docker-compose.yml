@@ -1,10 +1,17 @@
 ﻿version: "3.9"
 services:
-  # Dev Docker
   daemon:
+    image: ghcr.io/acces-sh/daemon:latest
+    volumes:
+      - "./authorized_keys:/app/authorized_keys/"
+    environment:
+      API_TOKEN: "YOUR_TOKEN"
+  
+  # Dev ENV Docker
+  daemon-dev:
     build:
       context: ./
-      dockerfile: ./Dockerfiles/amd64/Dockerfile
+      dockerfile: ./Dockerfiles/multi/Dockerfile
     volumes:
       - "./authorized_keys:/app/authorized_keys"
     environment:
